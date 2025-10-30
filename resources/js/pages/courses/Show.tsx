@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import type { PageProps, Course } from '@/types';
 import { getLevelBadgeColor, formatDate } from '@/lib/utils';
 import { useRTL } from '@/hooks/useRTL';
+import ScrollReveal from '@/components/motion/ScrollReveal';
 
 interface CourseShowProps extends PageProps {
   course: Course;
@@ -45,67 +46,79 @@ export default function CourseShow({ course }: CourseShowProps) {
       <Head title={course.title} />
 
       {/* Back Bar */}
-      <div className="border-b bg-muted/30">
-        <div className="container-responsive max-w-7xl mx-auto py-3 sm:py-4">
-          <Button asChild variant="ghost" size="sm" className="touch-target">
-            <Link href={`/${locale}/courses`} className={`inline-flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-2`}>
-              <ArrowLeft className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
-              {locale === 'ar' ? 'العودة إلى الدورات' : 'Back to Courses'}
-            </Link>
-          </Button>
+      <ScrollReveal y={6}>
+        <div className="border-b bg-muted/30">
+          <div className="container-responsive max-w-7xl mx-auto py-3 sm:py-4">
+            <Button asChild variant="ghost" size="sm" className="touch-target">
+              <Link href={`/${locale}/courses`} className={`inline-flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-2`}>
+                <ArrowLeft className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
+                {locale === 'ar' ? 'العودة إلى الدورات' : 'Back to Courses'}
+              </Link>
+            </Button>
+          </div>
         </div>
-      </div>
+      </ScrollReveal>
 
       <div className="container-responsive max-w-7xl mx-auto py-8 sm:py-12">
         <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px]">
           {/* Main */}
           <div className="space-y-6 sm:space-y-8">
             {course.cover_image && (
-              <div className="aspect-video w-full overflow-hidden rounded-lg shadow-sm">
-                <img src={course.cover_image.image_url} alt={course.title} className="h-full w-full object-cover" />
-              </div>
+              <ScrollReveal y={12}>
+                <div className="aspect-video w-full overflow-hidden rounded-lg shadow-sm">
+                  <img src={course.cover_image.image_url} alt={course.title} className="h-full w-full object-cover" />
+                </div>
+              </ScrollReveal>
             )}
 
             {/* Title + meta */}
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{course.title}</h1>
-                <Badge className={`${getLevelBadgeColor(course.level)} shrink-0`}>
-                  {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
-                </Badge>
+            <ScrollReveal y={8}>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{course.title}</h1>
+                  <Badge className={`${getLevelBadgeColor(course.level)} shrink-0`}>
+                    {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
+                  </Badge>
+                </div>
+                <div className={`inline-flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-2 text-xs sm:text-sm text-muted-foreground`}>
+                  <Calendar className="h-4 w-4" />
+                  <span>{formatDate(course.created_at, locale)}</span>
+                </div>
               </div>
-              <div className={`inline-flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-2 text-xs sm:text-sm text-muted-foreground`}>
-                <Calendar className="h-4 w-4" />
-                <span>{formatDate(course.created_at, locale)}</span>
-              </div>
-            </div>
+            </ScrollReveal>
 
-            <Separator />
+            <ScrollReveal y={6}>
+              <Separator />
+            </ScrollReveal>
 
             {/* Description */}
-            <div className="space-y-3 sm:space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold">
-                {locale === 'ar' ? 'الوصف' : 'Description'}
-              </h2>
-              <div
-                className="prose prose-sm sm:prose-base max-w-none dark:prose-invert"
-                dangerouslySetInnerHTML={{ __html: course.description }}
-              />
-            </div>
+            <ScrollReveal y={10}>
+              <div className="space-y-3 sm:space-y-4">
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  {locale === 'ar' ? 'الوصف' : 'Description'}
+                </h2>
+                <div
+                  className="prose prose-sm sm:prose-base max-w-none dark:prose-invert"
+                  dangerouslySetInnerHTML={{ __html: course.description }}
+                />
+              </div>
+            </ScrollReveal>
 
             {/* Gallery */}
             {course.images && course.images.length > 1 && (
               <div className="space-y-3 sm:space-y-4">
-                <h2 className="text-xl sm:text-2xl font-bold">
+                <ScrollReveal as="h2" y={8} className="text-xl sm:text-2xl font-bold">
                   {locale === 'ar' ? 'معرض الصور' : 'Image Gallery'}
-                </h2>
+                </ScrollReveal>
                 <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                   {course.images
                     .filter((img) => !img.is_cover)
-                    .map((image) => (
-                      <div key={image.id} className="aspect-video w-full overflow-hidden rounded-lg shadow-sm">
-                        <img src={image.image_url} alt={course.title} className="h-full w-full object-cover" />
-                      </div>
+                    .map((image, i) => (
+                      <ScrollReveal key={image.id} y={12} delay={i * 50}>
+                        <div className="aspect-video w-full overflow-hidden rounded-lg shadow-sm">
+                          <img src={image.image_url} alt={course.title} className="h-full w-full object-cover" />
+                        </div>
+                      </ScrollReveal>
                     ))}
                 </div>
               </div>
@@ -113,7 +126,7 @@ export default function CourseShow({ course }: CourseShowProps) {
           </div>
 
           {/* Sidebar */}
-          <aside className="space-y-4 sm:space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <ScrollReveal as="aside" y={8} delay={40} className="space-y-4 sm:space-y-6 lg:sticky lg:top-24 lg:self-start">
             <Card className="border-2 shadow-sm">
               <CardContent className="p-4 sm:p-6 space-y-4">
                 <Button className="w-full touch-target" size="lg" onClick={handleAccess}>
@@ -127,51 +140,53 @@ export default function CourseShow({ course }: CourseShowProps) {
               </CardContent>
             </Card>
 
-            <Card className="shadow-sm">
-              <CardContent className="p-4 sm:p-6 space-y-4">
-                <h3 className="font-semibold text-base sm:text-lg">
-                  {locale === 'ar' ? 'تفاصيل الدورة' : 'Course Details'}
-                </h3>
-                <Separator />
-                <div className="space-y-4">
-                  <DetailRow
-                    rtl={isRTL}
-                    icon={<Building2 className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
-                    label={locale === 'ar' ? 'المنصة' : 'Platform'}
-                    value={course.platform.name}
-                  />
-                  <DetailRow
-                    rtl={isRTL}
-                    icon={<FolderOpen className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
-                    label={locale === 'ar' ? 'الفئة' : 'Category'}
-                    value={course.category.name}
-                  />
-                  <DetailRow
-                    rtl={isRTL}
-                    icon={<Target className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
-                    label={locale === 'ar' ? 'المستوى' : 'Level'}
-                    value={<span className="capitalize">{course.level}</span>}
-                  />
-                  {course.duration && (
+            <ScrollReveal y={8} delay={80}>
+              <Card className="shadow-sm">
+                <CardContent className="p-4 sm:p-6 space-y-4">
+                  <h3 className="font-semibold text-base sm:text-lg">
+                    {locale === 'ar' ? 'تفاصيل الدورة' : 'Course Details'}
+                  </h3>
+                  <Separator />
+                  <div className="space-y-4">
                     <DetailRow
                       rtl={isRTL}
-                      icon={<Clock className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
-                      label={locale === 'ar' ? 'المدة' : 'Duration'}
-                      value={course.duration}
+                      icon={<Building2 className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
+                      label={locale === 'ar' ? 'المنصة' : 'Platform'}
+                      value={course.platform.name}
                     />
-                  )}
-                  <DetailRow
-                    rtl={isRTL}
-                    icon={<Award className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
-                    label={locale === 'ar' ? 'الشهادة' : 'Certificate'}
-                    value={course.have_certificate
-                      ? (locale === 'ar' ? 'متاح' : 'Available')
-                      : (locale === 'ar' ? 'غير متاح' : 'Not Available')}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </aside>
+                    <DetailRow
+                      rtl={isRTL}
+                      icon={<FolderOpen className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
+                      label={locale === 'ar' ? 'الفئة' : 'Category'}
+                      value={course.category.name}
+                    />
+                    <DetailRow
+                      rtl={isRTL}
+                      icon={<Target className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
+                      label={locale === 'ar' ? 'المستوى' : 'Level'}
+                      value={<span className="capitalize">{course.level}</span>}
+                    />
+                    {course.duration && (
+                      <DetailRow
+                        rtl={isRTL}
+                        icon={<Clock className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
+                        label={locale === 'ar' ? 'المدة' : 'Duration'}
+                        value={course.duration}
+                      />
+                    )}
+                    <DetailRow
+                      rtl={isRTL}
+                      icon={<Award className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />}
+                      label={locale === 'ar' ? 'الشهادة' : 'Certificate'}
+                      value={course.have_certificate
+                        ? (locale === 'ar' ? 'متاح' : 'Available')
+                        : (locale === 'ar' ? 'غير متاح' : 'Not Available')}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
+          </ScrollReveal>
         </div>
       </div>
     </AppLayout>

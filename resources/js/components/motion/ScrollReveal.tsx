@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
+import type { ElementType, CSSProperties } from 'react';
 
 type Props = React.PropsWithChildren<{
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;     // was: keyof JSX.IntrinsicElements
   className?: string;
-  delay?: number;      // ms
-  duration?: number;   // ms
-  y?: number;          // px translateY
-  once?: boolean;      // reveal only once
+  delay?: number;       // ms
+  duration?: number;    // ms
+  y?: number;           // px translateY
+  once?: boolean;       // reveal only once
 }>;
 
 /**
@@ -24,7 +25,7 @@ export default function ScrollReveal({
   y = 10,
   once = true,
 }: Props) {
-  const Tag = as as any;
+  const Tag = as as ElementType;
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -56,18 +57,16 @@ export default function ScrollReveal({
     return () => obs.disconnect();
   }, [once]);
 
+  const style: CSSProperties = {
+    opacity: visible ? 1 : 0,
+    transform: visible ? 'translate3d(0,0,0)' : `translate3d(0, ${y}px, 0)`,
+    transition: `opacity ${duration}ms ease, transform ${duration}ms ease`,
+    transitionDelay: `${delay}ms`,
+    willChange: 'opacity, transform',
+  };
+
   return (
-    <Tag
-      ref={ref as any}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translate3d(0,0,0)' : `translate3d(0, ${y}px, 0)`,
-        transition: `opacity ${duration}ms ease, transform ${duration}ms ease`,
-        transitionDelay: `${delay}ms`,
-        willChange: 'opacity, transform',
-      }}
-    >
+    <Tag ref={ref as any} className={className} style={style}>
       {children}
     </Tag>
   );

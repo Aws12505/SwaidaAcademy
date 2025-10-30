@@ -5,6 +5,7 @@ import BlogCard from '@/components/blog/BlogCard';
 import { Button } from '@/components/ui/button';
 import type { PageProps, Blog, PaginatedData } from '@/types';
 import { useRTL } from '@/hooks/useRTL';
+import ScrollReveal from '@/components/motion/ScrollReveal';
 
 interface BlogsIndexProps extends PageProps {
   blogs: PaginatedData<Blog>;
@@ -19,7 +20,7 @@ export default function BlogsIndex({ blogs }: BlogsIndexProps) {
       <Head title={locale === 'ar' ? 'المدونة' : 'Blog'} />
 
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary/5 to-secondary/5">
+      <ScrollReveal as="section" y={10} className="bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="container-responsive max-w-7xl mx-auto py-8 sm:py-12">
           <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-3 sm:gap-4 mb-2`}>
             <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-primary/10">
@@ -35,64 +36,72 @@ export default function BlogsIndex({ blogs }: BlogsIndexProps) {
               : 'Read the latest articles and news about education, courses, and scholarships'}
           </p>
         </div>
-      </section>
+      </ScrollReveal>
 
       {/* Content */}
-      <section>
+      <ScrollReveal as="section" y={10}>
         <div className="container-responsive max-w-7xl mx-auto py-8 sm:py-12">
           {/* Results header */}
-          <div className="mb-6 sm:mb-8">
-            <p className="text-sm text-muted-foreground">
-              {locale === 'ar'
-                ? `عرض ${blogs.from}-${blogs.to} من ${blogs.total} مقالة`
-                : `Showing ${blogs.from}-${blogs.to} of ${blogs.total} articles`}
-            </p>
-          </div>
+          <ScrollReveal as="div" y={6}>
+            <div className="mb-6 sm:mb-8">
+              <p className="text-sm text-muted-foreground">
+                {locale === 'ar'
+                  ? `عرض ${blogs.from}-${blogs.to} من ${blogs.total} مقالة`
+                  : `Showing ${blogs.from}-${blogs.to} of ${blogs.total} articles`}
+              </p>
+            </div>
+          </ScrollReveal>
 
           {/* Grid */}
           {blogs.data.length > 0 ? (
             <>
               <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                {blogs.data.map((blog) => (
-                  <BlogCard key={blog.id} blog={blog} />
+                {blogs.data.map((blog, i) => (
+                  <ScrollReveal key={blog.id} y={12} delay={i * 50}>
+                    <BlogCard blog={blog} />
+                  </ScrollReveal>
                 ))}
               </div>
 
               {/* Pagination */}
               {blogs.last_page > 1 && (
-                <div className="flex justify-center gap-2 pt-6 sm:pt-8 flex-wrap">
-                  {blogs.links.map((link, index) => (
-                    <Button
-                      key={index}
-                      variant={link.active ? 'default' : 'outline'}
-                      size="sm"
-                      disabled={!link.url}
-                      asChild={!!link.url}
-                      className="touch-target"
-                    >
-                      {link.url ? (
-                        <a href={link.url} dangerouslySetInnerHTML={{ __html: link.label }} />
-                      ) : (
-                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                      )}
-                    </Button>
-                  ))}
-                </div>
+                <ScrollReveal as="div" y={6} delay={60}>
+                  <div className="flex justify-center gap-2 pt-6 sm:pt-8 flex-wrap">
+                    {blogs.links.map((link, index) => (
+                      <Button
+                        key={index}
+                        variant={link.active ? 'default' : 'outline'}
+                        size="sm"
+                        disabled={!link.url}
+                        asChild={!!link.url}
+                        className="touch-target"
+                      >
+                        {link.url ? (
+                          <a href={link.url} dangerouslySetInnerHTML={{ __html: link.label }} />
+                        ) : (
+                          <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                        )}
+                      </Button>
+                    ))}
+                  </div>
+                </ScrollReveal>
               )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-center">
-              <BookOpen className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mb-4" />
-              <h3 className="text-base sm:text-lg font-semibold mb-2">
-                {locale === 'ar' ? 'لا توجد مقالات بعد' : 'No articles yet'}
-              </h3>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                {locale === 'ar' ? 'تحقق مرة أخرى قريبًا للحصول على محتوى جديد' : 'Check back soon for new content'}
-              </p>
-            </div>
+            <ScrollReveal y={10}>
+              <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-center">
+                <BookOpen className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mb-4" />
+                <h3 className="text-base sm:text-lg font-semibold mb-2">
+                  {locale === 'ar' ? 'لا توجد مقالات بعد' : 'No articles yet'}
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground">
+                  {locale === 'ar' ? 'تحقق مرة أخرى قريبًا للحصول على محتوى جديد' : 'Check back soon for new content'}
+                </p>
+              </div>
+            </ScrollReveal>
           )}
         </div>
-      </section>
+      </ScrollReveal>
     </AppLayout>
   );
 }

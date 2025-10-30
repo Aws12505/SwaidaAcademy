@@ -6,6 +6,7 @@ import ScholarshipCard from '@/components/scholarship/ScholarshipCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { PageProps, Course, Scholarship } from '@/types';
 import { useRTL } from '@/hooks/useRTL';
+import ScrollReveal from '@/components/motion/ScrollReveal';
 
 interface SearchResultsProps extends PageProps {
   results: { courses: Course[]; scholarships: Scholarship[]; };
@@ -22,7 +23,7 @@ export default function SearchResults({ results, query }: SearchResultsProps) {
       <Head title={`${locale === 'ar' ? 'نتائج البحث' : 'Search Results'}: ${query}`} />
 
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary/5 to-secondary/5">
+      <ScrollReveal as="section" y={10} className="bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="container-responsive max-w-7xl mx-auto py-8 sm:py-12">
           <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-3 sm:gap-4 mb-2`}>
             <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-primary/10 shrink-0">
@@ -38,10 +39,10 @@ export default function SearchResults({ results, query }: SearchResultsProps) {
               : `Searching for: "${query}" - ${totalResults} results`}
           </p>
         </div>
-      </section>
+      </ScrollReveal>
 
       {/* Content */}
-      <section>
+      <ScrollReveal as="section" y={10}>
         <div className="container-responsive max-w-7xl mx-auto py-8 sm:py-12">
           {totalResults > 0 ? (
             <Tabs defaultValue="all" className="w-full">
@@ -64,7 +65,11 @@ export default function SearchResults({ results, query }: SearchResultsProps) {
                   <div className="space-y-4 sm:space-y-6">
                     <h2 className="text-xl sm:text-2xl font-bold">{locale === 'ar' ? 'الدورات' : 'Courses'}</h2>
                     <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {results.courses.map((c) => <CourseCard key={c.id} course={c} />)}
+                      {results.courses.map((c, i) => (
+                        <ScrollReveal key={c.id} y={12} delay={i * 50}>
+                          <CourseCard course={c} />
+                        </ScrollReveal>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -72,7 +77,11 @@ export default function SearchResults({ results, query }: SearchResultsProps) {
                   <div className="space-y-4 sm:space-y-6">
                     <h2 className="text-xl sm:text-2xl font-bold">{locale === 'ar' ? 'المنح الدراسية' : 'Scholarships'}</h2>
                     <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {results.scholarships.map((s) => <ScholarshipCard key={s.id} scholarship={s} />)}
+                      {results.scholarships.map((s, i) => (
+                        <ScrollReveal key={s.id} y={12} delay={i * 50}>
+                          <ScholarshipCard scholarship={s} />
+                        </ScrollReveal>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -81,7 +90,11 @@ export default function SearchResults({ results, query }: SearchResultsProps) {
               <TabsContent value="courses">
                 {results.courses.length ? (
                   <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {results.courses.map((c) => <CourseCard key={c.id} course={c} />)}
+                    {results.courses.map((c, i) => (
+                      <ScrollReveal key={c.id} y={12} delay={i * 50}>
+                        <CourseCard course={c} />
+                      </ScrollReveal>
+                    ))}
                   </div>
                 ) : (
                   <EmptyState icon="course" locale={locale} />
@@ -91,7 +104,11 @@ export default function SearchResults({ results, query }: SearchResultsProps) {
               <TabsContent value="scholarships">
                 {results.scholarships.length ? (
                   <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {results.scholarships.map((s) => <ScholarshipCard key={s.id} scholarship={s} />)}
+                    {results.scholarships.map((s, i) => (
+                      <ScrollReveal key={s.id} y={12} delay={i * 50}>
+                        <ScholarshipCard scholarship={s} />
+                      </ScrollReveal>
+                    ))}
                   </div>
                 ) : (
                   <EmptyState icon="scholarship" locale={locale} />
@@ -102,7 +119,7 @@ export default function SearchResults({ results, query }: SearchResultsProps) {
             <EmptyState icon="search" locale={locale} />
           )}
         </div>
-      </section>
+      </ScrollReveal>
     </AppLayout>
   );
 }
@@ -120,10 +137,12 @@ function EmptyState({ icon, locale }: { icon: 'search' | 'course' | 'scholarship
     locale === 'ar' ? 'جرب البحث بكلمات مختلفة' : 'Try searching with different keywords';
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-center">
-      <Icon className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mb-4" />
-      <h3 className="text-base sm:text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-sm sm:text-base text-muted-foreground px-4">{subtitle}</p>
-    </div>
+    <ScrollReveal y={10}>
+      <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-center">
+        <Icon className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mb-4" />
+        <h3 className="text-base sm:text-lg font-semibold mb-2">{title}</h3>
+        <p className="text-sm sm:text-base text-muted-foreground px-4">{subtitle}</p>
+      </div>
+    </ScrollReveal>
   );
 }
