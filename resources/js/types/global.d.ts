@@ -1,5 +1,12 @@
-import type { route as routeFn } from 'ziggy-js';
+import { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { PageProps as AppPageProps } from './index';
 
 declare global {
-    const route: typeof routeFn;
+  interface Window {
+    translations: Record<string, string>;
+  }
+}
+
+declare module '@inertiajs/core' {
+  interface PageProps extends InertiaPageProps, AppPageProps {}
 }

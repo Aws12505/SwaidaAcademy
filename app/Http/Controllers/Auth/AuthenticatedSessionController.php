@@ -13,60 +13,54 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Show the login page.
-     */
-    public function create(Request $request): Response|RedirectResponse
-    {
-        if (Auth::check()) {
-            return redirect()->intended(route('dashboard'));
-        }
+public function create(Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
+{
+    $locale = session('locale') ?? app()->getLocale() ?? 'en';
 
-        return Inertia::render('auth/Login', [
-            'canResetPassword' => route('password.request') ? true : false,
-            'status' => $request->session()->get('status'),
-        ]);
+    if (auth()->check()) {
+        return auth()->user()->is_admin
+            ? redirect()->intended(route('admin.dashboard'))
+            : redirect()->intended(route('landing', ['locale' => $locale]));
     }
 
-    /**
-     * Handle login (validation inside the controller).
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'email'    => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
-            'remember' => ['nullable', 'boolean'],
-        ]);
+    return \Inertia\Inertia::render('auth/Login', [
+        'canResetPassword' => route('password.request') ? true : false,
+        'status' => $request->session()->get('status'),
+    ]);
+}
 
-        $credentials = [
-            'email'    => $validated['email'],
-            'password' => $validated['password'],
-        ];
+public function store(Request $request): \Illuminate\Http\RedirectResponse
+{
+    $validated = $request->validate([
+        'email'    => ['required', 'string', 'email'],
+        'password' => ['required', 'string'],
+        'remember' => ['nullable', 'boolean'],
+    ]);
 
-        if (! Auth::attempt($credentials, (bool)($validated['remember'] ?? false))) {
-            return back()
-                ->withErrors(['email' => __('auth.failed')])
-                ->onlyInput('email');
-        }
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard'));
+    if (!auth()->attempt(
+        ['email' => $validated['email'], 'password' => $validated['password']],
+        (bool)($validated['remember'] ?? false)
+    )) {
+        return back()->withErrors(['email' => __('auth.failed')])->onlyInput('email');
     }
 
-    /**
-     * Logout.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        if (Auth::check()) {
-            Auth::logout();
-        }
+    $request->session()->regenerate();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    $locale = session('locale') ?? app()->getLocale() ?? 'en';
 
-        return redirect()->route('home'); // or '/'
-    }
+    return auth()->user()->is_admin
+        ? redirect()->intended(route('admin.dashboard'))
+        : redirect()->intended(route('landing', ['locale' => $locale]));
+}
+
+public function destroy(Request $request): \Illuminate\Http\RedirectResponse
+{
+    auth()->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    $locale = session('locale') ?? app()->getLocale() ?? 'en';
+    return redirect()->to("/{$locale}");
+}
+
 }

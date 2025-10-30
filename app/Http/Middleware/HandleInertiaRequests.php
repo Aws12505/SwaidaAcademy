@@ -38,6 +38,11 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $locale = $request->route('locale')
+        ?? session('locale')
+        ?? app()->getLocale()
+        ?? 'en';
+        
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -46,6 +51,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'locale' => $locale,
         ];
     }
 }

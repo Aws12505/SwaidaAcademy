@@ -5,17 +5,73 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import {
-  LayoutPanelTop,   // for Header
+  LayoutDashboard,
+  GraduationCap,
+  Award,
+  Layers,
+  Tags,
+  Target,
+  Eye,
+  Newspaper,
+  Users,
 } from "lucide-react";
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: '/admin/dashboard',
-        icon: LayoutPanelTop,
-        group: 'Global',
-    },
+    title: 'Dashboard',
+    href: '/admin/dashboard',
+    icon: LayoutDashboard,
+    group: 'General',
+  },
+  {
+    title: 'Courses',
+    href: '/admin/courses',
+    icon: GraduationCap,
+    group: 'General',
+  },
+  {
+    title: 'Scholarships',
+    href: '/admin/scholarships',
+    icon: Award,
+    group: 'General',
+  },
+  {
+    title: 'Platforms',
+    href: '/admin/platforms',
+    icon: Layers,
+    group: 'General',
+  },
+  {
+    title: 'Categories',
+    href: '/admin/categories',
+    icon: Tags,
+    group: 'General',
+  },
+  {
+    title: 'Mission',
+    href: '/admin/mission/edit',
+    icon: Target,
+    group: 'General',
+  },
+  {
+    title: 'Vision',
+    href: '/admin/vision/edit',
+    icon: Eye,
+    group: 'General',
+  },
+  {
+    title: 'Blogs',
+    href: '/admin/blogs',
+    icon: Newspaper,
+    group: 'General',
+  },
+  {
+    title: 'Users',
+    href: '/admin/users',
+    icon: Users,
+    group: 'General',
+  },
 ];
 
 const footerNavItems: NavItem[] = [

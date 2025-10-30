@@ -17,9 +17,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+        ]);
+        $middleware->alias([
+            'set.locale' => \App\Http\Middleware\SetLocale::class,
+            'admin' => \App\Http\Middleware\CheckAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

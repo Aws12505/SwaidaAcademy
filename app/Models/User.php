@@ -20,6 +20,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'whatsapp_number',
+        'is_admin',
         'password',
     ];
 
@@ -30,8 +32,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
         'remember_token',
     ];
 
@@ -45,7 +45,21 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'two_factor_confirmed_at' => 'datetime',
+            'is_admin' => 'boolean',
         ];
     }
+
+    // app/Models/User.php
+public function accessedCourses()
+{
+    return $this->belongsToMany(Course::class, 'course_user_accesses')
+        ->withTimestamps();
+}
+
+public function accessedScholarships()
+{
+    return $this->belongsToMany(Scholarship::class, 'scholarship_user_accesses')
+        ->withTimestamps();
+}
+
 }

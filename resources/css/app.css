@@ -1,100 +1,122 @@
 @import 'tailwindcss';
 
-
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans:
+    'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI,
+    Roboto, Ubuntu, Cantarell, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
 
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
 
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
 
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
 
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 :root {
-  --background: rgb(255, 255, 255);
-  --foreground: rgb(15, 17, 26);
-  --card: rgb(255, 255, 255);
-  --card-foreground: rgb(15, 17, 26);
-  --popover: rgb(255, 255, 255);
-  --popover-foreground: rgb(15, 17, 26);
-  --primary: rgb(46, 54, 143);
-  --primary-foreground: rgb(255, 255, 255);
-  --secondary: rgb(233, 50, 50);
-  --secondary-foreground: rgb(255, 255, 255);
-  --muted: rgb(244, 244, 245);
-  --muted-foreground: rgb(113, 113, 122);
-  --accent: rgb(238, 240, 255);
-  --accent-foreground: rgb(46, 54, 143);
-  --destructive: rgb(233, 50, 50);
-  --destructive-foreground: rgb(255, 255, 255);
-  --border: rgb(228, 228, 231);
-  --input: rgb(228, 228, 231);
-  --ring: rgb(46, 54, 143);
-  --chart-1: rgb(46, 54, 143);
-  --chart-2: rgb(233, 50, 50);
-  --chart-3: rgb(59, 130, 246);
-  --chart-4: rgb(22, 163, 74);
-  --chart-5: rgb(249, 115, 22);
-  --sidebar: rgb(244, 244, 245);
-  --sidebar-foreground: rgb(113, 113, 122);
-  --sidebar-primary: rgb(46, 54, 143);
-  --sidebar-primary-foreground: rgb(255, 255, 255);
-  --sidebar-accent: rgb(238, 240, 255);
-  --sidebar-accent-foreground: rgb(46, 54, 143);
-  --sidebar-border: rgb(228, 228, 231);
-  --sidebar-ring: rgb(46, 54, 143);
-  --font-sans: Inter;
+  /* -------- Typography & radii -------- */
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
   --font-serif: serif;
   --font-mono: monospace;
   --radius: 0.5rem;
+
+  /* -------- Core palette (LIGHT) --------
+     Your light-mode brand colors:
+     #192c6b (25,44,107)  • #2db8dc (45,184,220) • #d0d4d3 (208,212,211)
+  */
+  --background: rgb(248, 250, 250);             /* very light tint from #d0d4d3 */
+  --foreground: rgb(15, 17, 26);                 /* near-black for legibility */
+
+  --card: rgb(255, 255, 255);
+  --card-foreground: rgb(15, 17, 26);
+
+  --popover: rgb(255, 255, 255);
+  --popover-foreground: rgb(15, 17, 26);
+
+  --primary: rgb(25, 44, 107);                   /* #192c6b */
+  --primary-foreground: rgb(255, 255, 255);
+
+  --secondary: rgb(45, 184, 220);                /* #2db8dc */
+  --secondary-foreground: rgb(10, 13, 31);       /* deep navy text on cyan */
+
+  --muted: rgb(231, 236, 235);                   /* light surface from #d0d4d3 */
+  --muted-foreground: rgb(86, 99, 132);          /* desaturated navy for text */
+
+  --accent: rgb(208, 212, 211);                  /* #d0d4d3 */
+  --accent-foreground: rgb(25, 44, 107);         /* navy text on gray */
+
+  /* Semantic destructive stays red for clarity/accessibility */
+  --destructive: rgb(225, 29, 72);               /* rose-600 */
+  --destructive-foreground: rgb(255, 255, 255);
+
+  --border: rgb(222, 226, 226);                  /* soft border from gray */
+  --input: rgb(222, 226, 226);
+  --ring: rgb(25, 44, 107);                      /* focus ring = primary */
+
+  /* Charts tuned to the palette */
+  --chart-1: rgb(25, 44, 107);                   /* navy */
+  --chart-2: rgb(45, 184, 220);                  /* cyan */
+  --chart-3: rgb(34, 62, 150);                   /* brighter navy step */
+  --chart-4: rgb(21, 149, 186);                  /* deeper cyan step */
+  --chart-5: rgb(128, 143, 165);                 /* muted navy-gray */
+
+  /* Sidebar system */
+  --sidebar: rgb(240, 243, 243);                 /* slightly darker than bg */
+  --sidebar-foreground: rgb(86, 99, 132);        /* muted navy text */
+  --sidebar-primary: rgb(25, 44, 107);           /* primary */
+  --sidebar-primary-foreground: rgb(255, 255, 255);
+  --sidebar-accent: rgb(208, 212, 211);          /* accent block */
+  --sidebar-accent-foreground: rgb(25, 44, 107);
+  --sidebar-border: rgb(222, 226, 226);
+  --sidebar-ring: rgb(25, 44, 107);
+
+  /* -------- Shadows & spacing -------- */
   --shadow-2xs: 0px 4px 12px -2px hsl(0 0% 0% / 0.03);
   --shadow-xs: 0px 4px 12px -2px hsl(0 0% 0% / 0.03);
   --shadow-sm: 0px 4px 12px -2px hsl(0 0% 0% / 0.05), 0px 1px 2px -3px hsl(0 0% 0% / 0.05);
@@ -103,49 +125,63 @@
   --shadow-lg: 0px 4px 12px -2px hsl(0 0% 0% / 0.05), 0px 4px 6px -3px hsl(0 0% 0% / 0.05);
   --shadow-xl: 0px 4px 12px -2px hsl(0 0% 0% / 0.05), 0px 8px 10px -3px hsl(0 0% 0% / 0.05);
   --shadow-2xl: 0px 4px 12px -2px hsl(0 0% 0% / 0.13);
+
   --tracking-normal: 0rem;
   --spacing: 0.25rem;
 }
 
 .dark {
-  --background: rgb(15, 17, 26);
-  --foreground: rgb(248, 249, 250);
-  --card: rgb(21, 24, 35);
-  --card-foreground: rgb(248, 249, 250);
-  --popover: rgb(21, 24, 35);
-  --popover-foreground: rgb(248, 249, 250);
-  --primary: rgb(74, 82, 178);
-  --primary-foreground: rgb(255, 255, 255);
-  --secondary: rgb(233, 50, 50);
-  --secondary-foreground: rgb(255, 255, 255);
-  --muted: rgb(39, 42, 56);
-  --muted-foreground: rgb(161, 167, 185);
-  --accent: rgb(74, 82, 178);
-  --accent-foreground: rgb(255, 255, 255);
-  --destructive: rgb(233, 50, 50);
+  /* -------- Core palette (DARK) --------
+     Keep the same brand, flip emphasis for contrast:
+     Cyan becomes the bright primary; navy becomes the deep accent.
+  */
+  --background: rgb(10, 13, 31);                 /* deep navy */
+  --foreground: rgb(239, 245, 249);              /* near-white */
+
+  --card: rgb(15, 18, 38);
+  --card-foreground: rgb(239, 245, 249);
+
+  --popover: rgb(15, 18, 38);
+  --popover-foreground: rgb(239, 245, 249);
+
+  --primary: rgb(45, 184, 220);                  /* cyan pops on dark */
+  --primary-foreground: rgb(10, 13, 31);         /* dark text on bright chip */
+
+  --secondary: rgb(25, 44, 107);                 /* navy secondary */
+  --secondary-foreground: rgb(239, 245, 249);
+
+  --muted: rgb(33, 40, 63);                      /* subdued surface */
+  --muted-foreground: rgb(158, 171, 205);
+
+  --accent: rgb(25, 44, 107);                    /* navy accents */
+  --accent-foreground: rgb(239, 245, 249);
+
+  --destructive: rgb(225, 29, 72);
   --destructive-foreground: rgb(255, 255, 255);
-  --border: rgb(39, 42, 56);
-  --input: rgb(39, 42, 56);
-  --ring: rgb(74, 82, 178);
-  --chart-1: rgb(46, 54, 143);
-  --chart-2: rgb(233, 50, 50);
-  --chart-3: rgb(59, 130, 246);
-  --chart-4: rgb(22, 163, 74);
-  --chart-5: rgb(249, 115, 22);
-  --sidebar: rgb(21, 24, 35);
-  --sidebar-foreground: rgb(161, 167, 185);
-  --sidebar-primary: rgb(74, 82, 178);
-  --sidebar-primary-foreground: rgb(255, 255, 255);
-  --sidebar-accent: rgb(74, 82, 178);
-  --sidebar-accent-foreground: rgb(255, 255, 255);
-  --sidebar-border: rgb(39, 42, 56);
-  --sidebar-ring: rgb(74, 82, 178);
-  --font-sans: Inter;
-  --font-serif: serif;
-  --font-mono: monospace;
-  --radius: 0.5rem;
-  --shadow-2xs: 0px 4px 12px -2px hsl(0 0% 0% / 0.05);
-  --shadow-xs: 0px 4px 12px -2px hsl(0 0% 0% / 0.05);
+
+  --border: rgb(33, 40, 63);
+  --input: rgb(33, 40, 63);
+  --ring: rgb(45, 184, 220);                     /* bright ring on dark */
+
+  --chart-1: rgb(45, 184, 220);                   /* cyan lead */
+  --chart-2: rgb(128, 143, 165);                  /* muted navy-gray */
+  --chart-3: rgb(25, 44, 107);                    /* navy */
+  --chart-4: rgb(21, 149, 186);                   /* cyan step */
+  --chart-5: rgb(208, 212, 211);                  /* soft gray for contrast */
+
+  --sidebar: rgb(15, 18, 38);
+  --sidebar-foreground: rgb(158, 171, 205);
+  --sidebar-primary: rgb(45, 184, 220);
+  --sidebar-primary-foreground: rgb(10, 13, 31);
+  --sidebar-accent: rgb(25, 44, 107);
+  --sidebar-accent-foreground: rgb(239, 245, 249);
+  --sidebar-border: rgb(33, 40, 63);
+  --sidebar-ring: rgb(45, 184, 220);
+
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
+
+  --shadow-2xs: 0px 4px 12px -2px hsl(0 0% 0% / 0.10);
+  --shadow-xs: 0px 4px 12px -2px hsl(0 0% 0% / 0.10);
   --shadow-sm: 0px 4px 12px -2px hsl(0 0% 0% / 0.10), 0px 1px 2px -3px hsl(0 0% 0% / 0.10);
   --shadow: 0px 4px 12px -2px hsl(0 0% 0% / 0.10), 0px 1px 2px -3px hsl(0 0% 0% / 0.10);
   --shadow-md: 0px 4px 12px -2px hsl(0 0% 0% / 0.10), 0px 2px 4px -3px hsl(0 0% 0% / 0.10);
@@ -154,13 +190,39 @@
   --shadow-2xl: 0px 4px 12px -2px hsl(0 0% 0% / 0.25);
 }
 
-
 @layer base {
-    * {
-        @apply border-border;
-    }
+  * {
+    @apply border-border;
+  }
 
-    body {
-        @apply bg-background text-foreground;
-    }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+
+  [dir="ltr"] {
+    direction: ltr;
+  }
+
+  /* Ensure proper text direction */
+  [dir="rtl"] * {
+    text-align: inherit;
+  }
+}
+
+/* Responsive utilities */
+@layer utilities {
+  /* Responsive padding and margin helpers */
+  .container-responsive {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Touch-friendly spacing for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
 }

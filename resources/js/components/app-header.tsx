@@ -18,22 +18,56 @@ import AppLogoIcon from './app-logo-icon';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: '/admin/dashboard',
         icon: LayoutGrid,
+        group: "General",
     },
+    {
+        title: 'Courses',
+        href: '/admin/courses',
+        icon: BookOpen,
+        group: "General",
+    },
+    {
+        title: 'Scholarships',
+        href: '/admin/scholarships',
+        icon: Folder,
+        group: "General",
+    },
+    {
+        title: 'Platforms',
+        href: '/admin/platforms',
+        icon: Folder,
+        group: "General",
+    },
+    {
+        title: 'Categories',
+        href: '/admin/categories',
+        icon: Folder,
+        group: "General",
+    },
+    {
+        title: 'Mission',
+        href: '/admin/mission',
+        icon: Folder,
+        group: "General",
+    },
+    {
+        title: 'Vision',
+        href: '/admin/vision',
+        icon: Folder,
+        group: "General",
+    },
+    {
+        title: 'Blogs',
+        href: '/admin/blogs',
+        icon: Folder,
+        group: "General",
+    }
 ];
 
 const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+
 ];
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
@@ -94,7 +128,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         </Sheet>
                     </div>
 
-                    <Link href="/dashboard" prefetch className="flex items-center space-x-2">
+                    <Link href="/admin/dashboard" prefetch className="flex items-center space-x-2">
                         <AppLogo />
                     </Link>
 
@@ -156,7 +190,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="size-10 rounded-full p-1">
                                     <Avatar className="size-8 overflow-hidden rounded-full">
-                                        <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
                                         <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                             {getInitials(auth.user.name)}
                                         </AvatarFallback>

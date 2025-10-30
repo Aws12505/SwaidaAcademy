@@ -1,21 +1,100 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ScholarshipController;
+use App\Http\Controllers\BlogController;
 
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect('/admin/dashboard');
-    }
-    return redirect()->route('login');
-})->name('home');
+// Localized Routes for Frontend
+Route::prefix('{locale}')->where(['locale' => 'en|ar'])
+    ->middleware('set.locale')
+    ->group(function () {
+                Route::middleware('auth')->group(function () {
+        Route::post('/courses/{course}/access', [App\Http\Controllers\Admin\UserController::class, 'pressCourseAccess'])
+            ->name('courses.access');
 
-Route::middleware(['auth', 'verified'])->prefix('/admin')->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+        Route::post('/scholarships/{scholarship}/access', [App\Http\Controllers\Admin\UserController::class, 'pressScholarshipAccess'])
+            ->name('scholarships.access');
+        });
+        // Landing Page
+        Route::get('/', [LandingController::class, 'index'])->name('landing');
+        
+        // Global Search
+        Route::get('/search', [LandingController::class, 'search'])->name('search');
+        
+        // Courses
+        Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/{id}', [CourseController::class, 'show'])->where('id', '[0-9]+')->name('courses.show');
+        
+        // Scholarships
+        Route::get('/scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
+        Route::get('/scholarships/{id}', [ScholarshipController::class, 'show'])->where('id', '[0-9]+')->name('scholarships.show');
+        
+        // Blogs
+        Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+        Route::get('/blogs/{id}', [BlogController::class, 'show'])->where('id', '[0-9]+')->name('blogs.show');
+        
+        // Auth Routes
+        Route::middleware(['set.locale','guest'])->group(function () {
+            Route::get('/login', function () {
+                return inertia('auth/Login');
+            })->name('login');
+            
+            Route::get('/register', function () {
+                return inertia('auth/Register');
+            })->name('register');
+        });
+    });
+
+// Auth Actions (without locale)
+Route::post('/login', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store'])->middleware('set.locale');
+Route::post('/register', [App\Http\Controllers\Auth\RegisteredUserController::class, 'store'])->middleware('set.locale');
+Route::post('/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])
+    ->middleware(['set.locale','auth']);
+
+// Admin Routes (No locale prefix)
+Route::prefix('admin')->name('admin.')->middleware(['set.locale','auth','admin'])->group(function () {
+    
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\AnalyticsController::class, 'dashboard'])
+        ->name('dashboard');
+
+    // Deep analytics
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])
+        ->name('analytics.index');
+
+    
+    // Users
+    Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+
+    // Courses
+    Route::resource('courses', App\Http\Controllers\Admin\CourseController::class);
+    
+    // Scholarships
+    Route::resource('scholarships', App\Http\Controllers\Admin\ScholarshipController::class);
+    
+    // Blogs
+    Route::resource('blogs', App\Http\Controllers\Admin\BlogController::class);
+    
+    // Platforms
+    Route::resource('platforms', App\Http\Controllers\Admin\PlatformController::class);
+    
+    // Categories
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
+    
+    // Vision
+    Route::get('/vision/edit', [App\Http\Controllers\Admin\VisionController::class, 'edit'])->name('vision.edit');
+    Route::put('/vision', [App\Http\Controllers\Admin\VisionController::class, 'update'])->name('vision.update');
+    
+    // Mission
+    Route::get('/mission/edit', [App\Http\Controllers\Admin\MissionController::class, 'edit'])->name('mission.edit');
+    Route::put('/mission', [App\Http\Controllers\Admin\MissionController::class, 'update'])->name('mission.update');
 });
 
+// Default redirect to English
+Route::get('/', function () {
+    return redirect('/en');
+});
+
+
 require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';

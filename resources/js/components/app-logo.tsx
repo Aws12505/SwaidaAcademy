@@ -7,7 +7,7 @@ export default function AppLogo() {
                 <img 
                     src="/logo.png"
                     alt="Trucking 360 Logo"
-                    className="size-8 object-contain"
+                    className="size-15 object-contain"
                 />
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm">
