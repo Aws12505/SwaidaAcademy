@@ -1,5 +1,6 @@
 <?php
 
+// app/Models/ImageGallery.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,26 +11,19 @@ class ImageGallery extends Model
     use HasFactory;
 
     protected $fillable = [
-        'imageable_type',
-        'imageable_id',
-        'image_path',
-        'is_cover',
+        'imageable_type','imageable_id','image_path','is_cover',
+        'is_inline','meta','draft_token',
     ];
 
     protected $casts = [
         'is_cover' => 'boolean',
+        'is_inline' => 'boolean',
+        'meta' => 'array',
     ];
 
-    public function imageable()
-    {
-        return $this->morphTo();
-    }
+    protected $appends = ['image_url'];
 
-    /**
-     * Get full URL for image
-     */
-    public function getImageUrlAttribute()
-    {
-        return asset('storage/' . $this->image_path);
-    }
+    public function imageable() { return $this->morphTo(); }
+
+    public function getImageUrlAttribute() { return asset('storage/'.$this->image_path); }
 }

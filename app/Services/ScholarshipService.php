@@ -93,4 +93,10 @@ class ScholarshipService
             ->get()
             ->toArray();
     }
+
+    public function getScholarshipBySlug(string $slug): Scholarship
+{
+    return Scholarship::with(['platform','category','images'])->where('slug',$slug)->firstOrFail();
+}
+
 }

@@ -93,4 +93,10 @@ class CourseService
             ->get()
             ->toArray();
     }
+
+    public function getCourseBySlug(string $slug): Course
+{
+    return Course::with(['platform','category','images'])->where('slug',$slug)->firstOrFail();
+}
+
 }

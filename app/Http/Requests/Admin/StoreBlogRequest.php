@@ -23,6 +23,7 @@ class StoreBlogRequest extends FormRequest
             'images' => 'nullable|array|max:10',
             'images.*.file' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'images.*.is_cover' => 'boolean',
+            'draft_token' => ['nullable','string','max:100'],
         ];
     }
 }

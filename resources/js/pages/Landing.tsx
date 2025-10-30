@@ -29,6 +29,13 @@ export default function Landing({ courses, scholarships, vision, mission }: Land
         <div className="container-responsive max-w-7xl mx-auto py-10 sm:py-14 lg:py-20 xl:py-24">
           <ScrollReveal as="div" y={12}>
             <div className="mx-auto max-w-4xl text-center space-y-5 sm:space-y-7">
+              {/* Logo (added before the headline) */}
+              <div className="flex justify-center">
+                <Link href={`/${locale}`} className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} gap-2`}>
+                  <img src="/logo.svg" alt="Logo" className="h-50 w-50" />
+                </Link>
+              </div>
+
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight">
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {locale === 'ar' ? 'اكتشف مستقبلك التعليمي' : 'Discover Your Educational Future'}
@@ -62,55 +69,6 @@ export default function Landing({ courses, scholarships, vision, mission }: Land
         {/* Decorative blobs (static) */}
         <div className="pointer-events-none absolute top-0 right-0 -z-10 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-0 -z-10 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-secondary/10 blur-3xl" />
-      </section>
-
-      {/* Vision & Mission */}
-      <section>
-        <div className="container-responsive max-w-7xl mx-auto py-10 sm:py-14 lg:py-20">
-          <div className="grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-2">
-            {vision && (
-              <ScrollReveal y={12}>
-                <Card className="border-2">
-                  <CardContent className="p-5 sm:p-7 lg:p-8 space-y-4">
-                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-3`}>
-                      <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-primary/10 shrink-0">
-                        <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                      </div>
-                      <h2 className="text-xl sm:text-2xl font-bold">
-                        {locale === 'ar' ? 'رؤيتنا' : 'Our Vision'}
-                      </h2>
-                    </div>
-                    <div
-                      className="prose prose-sm sm:prose-base max-w-none dark:prose-invert"
-                      dangerouslySetInnerHTML={{ __html: vision.content }}
-                    />
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-            )}
-
-            {mission && (
-              <ScrollReveal y={12} delay={80}>
-                <Card className="border-2">
-                  <CardContent className="p-5 sm:p-7 lg:p-8 space-y-4">
-                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-3`}>
-                      <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-secondary/10 shrink-0">
-                        <Target className="h-5 w-5 sm:h-6 sm:w-6 text-secondary" />
-                      </div>
-                      <h2 className="text-xl sm:text-2xl font-bold">
-                        {locale === 'ar' ? 'مهمتنا' : 'Our Mission'}
-                      </h2>
-                    </div>
-                    <div
-                      className="prose prose-sm sm:prose-base max-w-none dark:prose-invert"
-                      dangerouslySetInnerHTML={{ __html: mission.content }}
-                    />
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-            )}
-          </div>
-        </div>
       </section>
 
       {/* Featured Courses */}
@@ -173,6 +131,55 @@ export default function Landing({ courses, scholarships, vision, mission }: Land
                 <ScholarshipCard scholarship={scholarship} />
               </ScrollReveal>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vision & Mission (moved here, equal heights) */}
+      <section>
+        <div className="container-responsive max-w-7xl mx-auto py-10 sm:py-14 lg:py-20">
+          <div className="grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-2 items-stretch">
+            {vision && (
+              <ScrollReveal y={12}>
+                <Card className="border-2 h-full">
+                  <CardContent className="p-5 sm:p-7 lg:p-8 space-y-4 h-full flex flex-col">
+                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-3`}>
+                      <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-primary/10 shrink-0">
+                        <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-bold">
+                        {locale === 'ar' ? 'رؤيتنا' : 'Our Vision'}
+                      </h2>
+                    </div>
+                    <div
+                      className="prose prose-sm sm:prose-base max-w-none dark:prose-invert flex-1"
+                      dangerouslySetInnerHTML={{ __html: vision.content }}
+                    />
+                  </CardContent>
+                </Card>
+              </ScrollReveal>
+            )}
+
+            {mission && (
+              <ScrollReveal y={12} delay={80}>
+                <Card className="border-2 h-full">
+                  <CardContent className="p-5 sm:p-7 lg:p-8 space-y-4 h-full flex flex-col">
+                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''} gap-3`}>
+                      <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-secondary/10 shrink-0">
+                        <Target className="h-5 w-5 sm:h-6 sm:w-6 text-secondary" />
+                      </div>
+                      <h2 className="text-xl sm:text-2xl font-bold">
+                        {locale === 'ar' ? 'مهمتنا' : 'Our Mission'}
+                      </h2>
+                    </div>
+                    <div
+                      className="prose prose-sm sm:prose-base max-w-none dark:prose-invert flex-1"
+                      dangerouslySetInnerHTML={{ __html: mission.content }}
+                    />
+                  </CardContent>
+                </Card>
+              </ScrollReveal>
+            )}
           </div>
         </div>
       </section>

@@ -42,7 +42,7 @@ export default function CourseCard({ course }: CourseCardProps) {
 
   return (
     <Card className="group overflow-hidden transition-shadow hover:shadow-lg flex flex-col h-full">
-      <Link href={`/${locale}/courses/${course.id}`}>
+      <Link href={`/${locale}/courses/${course.slug}`}>
         <CardHeader className="p-0">
           <div className="relative aspect-video w-full overflow-hidden bg-muted">
             {course.cover_image ? (
@@ -64,7 +64,7 @@ export default function CourseCard({ course }: CourseCardProps) {
       </Link>
 
       <CardContent className="p-4 sm:p-5 space-y-2.5 sm:space-y-3 flex-1">
-        <Link href={`/${locale}/courses/${course.id}`}>
+        <Link href={`/${locale}/courses/${course.slug}`}>
           <h3 className="font-semibold text-base sm:text-lg line-clamp-2 transition-colors group-hover:text-primary">
             {course.title}
           </h3>

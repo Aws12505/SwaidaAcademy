@@ -9,7 +9,8 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import QuillEditorPro from '@/components/QuillEditorPro';
 import type { BreadcrumbItem, Blog } from '@/types';
-import { useState, FormEventHandler } from 'react';
+import { useState, FormEventHandler, useEffect } from 'react';
+import { v4 as uuid } from 'uuid';
 
 interface EditBlogProps {
   blog: Blog & {
@@ -31,12 +32,16 @@ export default function EditBlog({ blog }: EditBlogProps) {
     title: { en: string; ar: string };
     content: { en: string; ar: string };
     images: Array<{ file: File; is_cover: boolean }>;
+    draft_token?: string;
   }>({
     title: blog.title,
     content: blog.content,
     images: [],
+    draft_token: undefined,
   });
-
+useEffect(() => {
+  if (!(data as any).draft_token) setData('draft_token', uuid());
+}, []);
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const newImages = files.map((file, index) => ({

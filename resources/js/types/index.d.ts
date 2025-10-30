@@ -70,6 +70,7 @@ export interface Course {
   id: number;
   title: string;
   description: string;
+  slug: string;
   external_url: string;
   duration?: string;
   platform_id: number;
@@ -87,6 +88,7 @@ export interface Course {
 export interface Scholarship {
   id: number;
   title: string;
+  slug: string;
   description: string;
   external_url: string;
   duration?: string;
@@ -110,6 +112,7 @@ export interface Blog {
   images?: ImageGallery[];
   created_at: string;
   updated_at: string;
+  slug: string;
 }
 
 export interface Vision {

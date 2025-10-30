@@ -1,5 +1,6 @@
 <?php
 
+// app/Services/ImageService.php
 namespace App\Services;
 
 use App\Models\ImageGallery;
@@ -7,56 +8,66 @@ use Illuminate\Support\Facades\Storage;
 
 class ImageService
 {
-    /**
-     * Handle image upload and association
-     */
     public function handleImages($model, array $images, bool $deleteExisting = false): void
     {
         if ($deleteExisting) {
-            $this->deleteModelImages($model);
+            $this->deleteModelImages($model, inlineAlso:false);
         }
 
         foreach ($images as $imageData) {
             if (isset($imageData['file']) && $imageData['file']->isValid()) {
                 $path = $imageData['file']->store('images', 'public');
-                
                 $model->images()->create([
                     'image_path' => $path,
-                    'is_cover' => $imageData['is_cover'] ?? false,
+                    'is_cover'   => $imageData['is_cover'] ?? false,
+                    'is_inline'  => false,
                 ]);
             }
         }
 
-        // Ensure only one cover image exists
         $this->ensureSingleCoverImage($model);
     }
 
-    /**
-     * Delete all images for a model
-     */
-    public function deleteModelImages($model): void
+    public function deleteModelImages($model, bool $inlineAlso = true): void
     {
-        foreach ($model->images as $image) {
+        $query = $model->images();
+        if (!$inlineAlso) $query->where('is_inline', false);
+
+        foreach ($query->get() as $image) {
             Storage::disk('public')->delete($image->image_path);
             $image->delete();
         }
     }
 
-    /**
-     * Ensure model has only one cover image
-     */
-    protected function ensureSingleCoverImage($model): void
+    public function ensureSingleCoverImage($model): void
     {
         $coverImages = $model->images()->where('is_cover', true)->get();
-
         if ($coverImages->count() > 1) {
-            // Keep the first one, remove cover status from others
-            $coverImages->skip(1)->each(function ($image) {
-                $image->update(['is_cover' => false]);
-            });
-        } elseif ($coverImages->count() === 0 && $model->images()->count() > 0) {
-            // If no cover, make the first image the cover
-            $model->images()->first()->update(['is_cover' => true]);
+            $coverImages->skip(1)->each(fn($img) => $img->update(['is_cover' => false]));
+        } elseif ($coverImages->count() === 0 && $model->images()->where('is_inline',false)->count() > 0) {
+            $model->images()->where('is_inline',false)->first()->update(['is_cover' => true]);
         }
+    }
+
+    public function deleteInlineImagesNotInContent($model, ?string $html): void
+    {
+        if (!$html) return;
+
+        preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', $html, $matches);
+        $srcsInContent = collect($matches[1] ?? [])->map(function ($src) {
+            // convert full URL back to relative storage path
+            $prefix = asset('storage/').'/';
+            return str_starts_with($src, $prefix) ? substr($src, strlen($prefix)) : null;
+        })->filter()->values();
+
+        $model->images()
+            ->where('is_inline', true)
+            ->get()
+            ->each(function (ImageGallery $img) use ($srcsInContent) {
+                if (!$srcsInContent->contains($img->image_path)) {
+                    Storage::disk('public')->delete($img->image_path);
+                    $img->delete();
+                }
+            });
     }
 }

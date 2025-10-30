@@ -309,13 +309,71 @@ export default function CreateCourse({ platforms, categories, levels }: CreateCo
                 </CardContent>
               </Card>
 
-              {/* Images - keep as is */}
+              {/* New Images */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Images</CardTitle>
+                  <CardTitle>Upload New Images</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* ... existing image upload code ... */}
+                  <div className="space-y-2">
+                    <Label htmlFor="images">Upload Images</Label>
+                    <div className="flex items-center gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('images')?.click()}
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Choose Files
+                      </Button>
+                      <input
+                        id="images"
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {imageFiles.length} file(s) selected
+                      </span>
+                    </div>
+                  </div>
+
+                  {imageFiles.length > 0 && (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {imageFiles.map((img, index) => (
+                        <div
+                          key={index}
+                          className="relative group aspect-video overflow-hidden rounded-lg border"
+                        >
+                          <img
+                            src={img.preview}
+                            alt={`Upload ${index + 1}`}
+                            className="h-full w-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={img.is_cover ? 'default' : 'secondary'}
+                              onClick={() => setCoverImage(index)}
+                            >
+                              {img.is_cover ? 'Cover' : 'Set Cover'}
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => removeImage(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

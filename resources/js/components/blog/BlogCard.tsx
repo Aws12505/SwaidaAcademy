@@ -15,7 +15,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
 
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-lg h-full flex flex-col">
-      <Link href={`/${locale}/blogs/${blog.id}`} className="focus-visible:outline-none">
+      <Link href={`/${locale}/blogs/${blog.slug}`} className="focus-visible:outline-none">
         <CardHeader className="p-0">
           <div className="relative aspect-video w-full overflow-hidden bg-muted">
             {blog.cover_image ? (

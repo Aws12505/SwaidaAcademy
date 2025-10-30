@@ -49,13 +49,13 @@ class CourseController extends Controller
     /**
      * Display single course
      */
-    public function show(Request $request, string $locale, int $id): Response
-    {
-        $course = $this->courseService->getCourseById($id);
+    public function show(Request $request, string $locale, string $slug): Response
+{
+    $course = $this->courseService->getCourseBySlug($slug);
 
-        return Inertia::render('courses/Show', [
-            'course' => $course,
-            'locale' => $locale,
-        ]);
-    }
+    return Inertia::render('courses/Show', [
+        'course' => $course,
+        'locale' => $locale,
+    ]);
+}
 }

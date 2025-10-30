@@ -25,16 +25,17 @@ Route::prefix('{locale}')->where(['locale' => 'en|ar'])
         
         // Courses
         Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
-        Route::get('/courses/{id}', [CourseController::class, 'show'])->where('id', '[0-9]+')->name('courses.show');
-        
+Route::get('/courses/{course:slug}', [CourseController::class, 'show'])
+    ->name('courses.show');        
         // Scholarships
         Route::get('/scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
-        Route::get('/scholarships/{id}', [ScholarshipController::class, 'show'])->where('id', '[0-9]+')->name('scholarships.show');
+Route::get('/scholarships/{scholarship:slug}', [ScholarshipController::class, 'show'])
+    ->name('scholarships.show');
         
         // Blogs
         Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
-        Route::get('/blogs/{id}', [BlogController::class, 'show'])->where('id', '[0-9]+')->name('blogs.show');
-        
+        Route::get('/blogs/{blog:slug}', [BlogController::class, 'show'])
+            ->name('blogs.show');        
         // Auth Routes
         Route::middleware(['set.locale','guest'])->group(function () {
             Route::get('/login', function () {
@@ -63,7 +64,7 @@ Route::prefix('admin')->name('admin.')->middleware(['set.locale','auth','admin']
     Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])
         ->name('analytics.index');
 
-    
+
     // Users
     Route::resource('users', App\Http\Controllers\Admin\UserController::class);
 
@@ -89,6 +90,13 @@ Route::prefix('admin')->name('admin.')->middleware(['set.locale','auth','admin']
     // Mission
     Route::get('/mission/edit', [App\Http\Controllers\Admin\MissionController::class, 'edit'])->name('mission.edit');
     Route::put('/mission', [App\Http\Controllers\Admin\MissionController::class, 'update'])->name('mission.update');
+
+        Route::post('/uploads/images', [\App\Http\Controllers\Admin\UploadController::class, 'store'])
+        ->name('uploads.images.store'); // returns {id, image_url}
+    Route::get('/uploads/images', [\App\Http\Controllers\Admin\UploadController::class, 'index'])
+        ->name('uploads.images.index'); // list for gallery dialog
+    Route::delete('/uploads/images/{imageGallery}', [\App\Http\Controllers\Admin\UploadController::class, 'destroy'])
+        ->name('uploads.images.destroy');
 });
 
 // Default redirect to English

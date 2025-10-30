@@ -37,8 +37,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between gap-3">
           {/* Logo */}
           <Link href={`/${locale}`} className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} gap-2`}>
-            <img src="/logo.svg" alt="Logo" className="h-25 w-25" />
-            <span className="hidden sm:inline-block font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Swaida Academy
             </span>
           </Link>
@@ -125,7 +124,7 @@ export default function Navbar() {
                     className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} gap-2`}
                   >
                     <img src="/logo.svg" alt="Logo" className="h-25 w-25" />
-                    <span className="font-semibold">Swaida Academy</span>
+                    <span className="font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Swaida Academy</span>
                   </Link>
                   {/* <Button
                     variant="ghost"

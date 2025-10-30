@@ -20,15 +20,12 @@ interface CourseFiltersProps {
   currentFilters: Filters;
 }
 
-/** Sentinels for Radix Select to avoid empty-string items */
 const ALL = '__all__';
 const ANY = '__any__';
 
-/** string[] -> string (first) | undefined */
 const toSingle = (v: string | string[] | undefined | null): string | undefined =>
   Array.isArray(v) ? v[0] : (v || undefined);
 
-/** Filters -> RequestPayload (Record<string, FormDataConvertible>) */
 const toPayload = (obj: Filters): Record<string, any> => {
   const payload: Record<string, any> = {};
   for (const [k, v] of Object.entries(obj)) {
@@ -69,7 +66,7 @@ export default function CourseFilters({
     router.get(`/${locale}/courses`, {}, { preserveState: true, preserveScroll: true });
   };
 
-  // Debounce search
+  // debounce search
   useEffect(() => {
     const t = setTimeout(() => {
       setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: undefined }));
@@ -77,17 +74,18 @@ export default function CourseFilters({
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  // Apply on filters change
   useEffect(() => {
     applyFilters(filters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const FilterContent = () => (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Search */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">{locale === 'ar' ? 'البحث' : 'Search'}</label>
+      <div>
+        <label className="block text-sm font-medium mb-3 sm:mb-4">
+          {locale === 'ar' ? 'البحث' : 'Search'}
+        </label>
         <div className="relative">
           <Search className={`absolute top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} />
           <Input
@@ -103,8 +101,10 @@ export default function CourseFilters({
       <Separator />
 
       {/* Platform */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">{locale === 'ar' ? 'المنصة' : 'Platform'}</label>
+      <div>
+        <label className="block text-sm font-medium mb-3 sm:mb-4">
+          {locale === 'ar' ? 'المنصة' : 'Platform'}
+        </label>
         <Select
           value={filters.platform_id !== undefined ? String(filters.platform_id) : ALL}
           onValueChange={(v) =>
@@ -128,8 +128,10 @@ export default function CourseFilters({
       </div>
 
       {/* Category */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">{locale === 'ar' ? 'الفئة' : 'Category'}</label>
+      <div>
+        <label className="block text-sm font-medium mb-3 sm:mb-4">
+          {locale === 'ar' ? 'الفئة' : 'Category'}
+        </label>
         <Select
           value={filters.category_id !== undefined ? String(filters.category_id) : ALL}
           onValueChange={(v) =>
@@ -153,8 +155,10 @@ export default function CourseFilters({
       </div>
 
       {/* Level */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">{locale === 'ar' ? 'المستوى' : 'Level'}</label>
+      <div>
+        <label className="block text-sm font-medium mb-3 sm:mb-4">
+          {locale === 'ar' ? 'المستوى' : 'Level'}
+        </label>
         <Select
           value={toSingle(filters.level) ?? ALL}
           onValueChange={(v) =>
@@ -174,8 +178,10 @@ export default function CourseFilters({
       </div>
 
       {/* Certificate */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">{locale === 'ar' ? 'الشهادة' : 'Certificate'}</label>
+      <div>
+        <label className="block text-sm font-medium mb-3 sm:mb-4">
+          {locale === 'ar' ? 'الشهادة' : 'Certificate'}
+        </label>
         <Select
           value={
             filters.have_certificate === undefined
@@ -202,8 +208,10 @@ export default function CourseFilters({
       </div>
 
       {/* Sort */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">{locale === 'ar' ? 'الترتيب' : 'Sort By'}</label>
+      <div>
+        <label className="block text-sm font-medium mb-3 sm:mb-4">
+          {locale === 'ar' ? 'الترتيب' : 'Sort By'}
+        </label>
         <Select
           value={toSingle(filters.sort_by)}
           onValueChange={(v) => setFilters((prev) => ({ ...prev, sort_by: v || undefined, page: undefined }))}
@@ -230,7 +238,7 @@ export default function CourseFilters({
       {/* Desktop */}
       <div className="hidden lg:block">
         <Card className="p-4 sm:p-6">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-7 sm:mb-8 flex items-center justify-between">
             <h2 className="font-semibold text-base sm:text-lg">{locale === 'ar' ? 'الفلاتر' : 'Filters'}</h2>
             {activeFiltersCount > 0 && <Badge variant="secondary">{activeFiltersCount}</Badge>}
           </div>
@@ -259,7 +267,8 @@ export default function CourseFilters({
             <SheetHeader className="px-4 py-3 border-b">
               <SheetTitle>{locale === 'ar' ? 'الفلاتر' : 'Filters'}</SheetTitle>
             </SheetHeader>
-            <div className="px-4 py-5">
+            {/* Extra space under title */}
+            <div className="px-4 py-6 sm:py-8">
               <FilterContent />
             </div>
             <div className="h-[env(safe-area-inset-bottom)]" />

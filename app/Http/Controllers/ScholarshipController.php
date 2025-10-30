@@ -49,13 +49,13 @@ class ScholarshipController extends Controller
     /**
      * Display single scholarship
      */
-    public function show(Request $request, string $locale, int $id): Response
-    {
-        $scholarship = $this->scholarshipService->getScholarshipById($id);
+public function show(Request $request, string $locale, string $slug): Response
+{
+    $scholarship = $this->scholarshipService->getScholarshipBySlug($slug);
 
-        return Inertia::render('scholarships/Show', [
-            'scholarship' => $scholarship,
-            'locale' => $locale,
-        ]);
-    }
+    return Inertia::render('scholarships/Show', [
+        'scholarship' => $scholarship,
+        'locale' => $locale,
+    ]);
+}
 }

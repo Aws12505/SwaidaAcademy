@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Translatable\HasTranslations;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 
 class Course extends Model
 {
@@ -23,6 +24,7 @@ class Course extends Model
         'category_id',
         'have_certificate',
         'level',
+        'slug',
     ];
 
     protected $casts = [
@@ -106,5 +108,36 @@ public function accessedBy()
     return $this->belongsToMany(User::class, 'course_user_accesses')
         ->withTimestamps();
 }
+protected static function booted()
+{
+    static::creating(function (Course $course) {
+        if (empty($course->slug)) {
+            $course->slug = static::uniqueSlugFromTitleEn($course->title);
+        }
+    });
 
+    static::updating(function (Course $course) {
+        if ($course->isDirty('title')) {
+            $course->slug = static::uniqueSlugFromTitleEn($course->title);
+        }
+    });
+}
+
+public static function uniqueSlugFromTitleEn(array|string $title): string
+{
+    $en = is_array($title) ? ($title['en'] ?? '') : $title;
+    $base = Str::slug($en ?: 'course');
+    $slug = $base ?: 'course';
+    $i = 2;
+    while (static::where('slug', $slug)->exists()) {
+        $slug = $base.'-'.$i++;
+    }
+    return $slug;
+}
+
+// Optional if you ever use implicit route-model binding publicly:
+public function getRouteKeyName(): string
+{
+    return 'slug';
+}
 }
