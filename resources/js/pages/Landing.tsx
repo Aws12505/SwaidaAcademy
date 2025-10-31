@@ -32,7 +32,7 @@ export default function Landing({ courses, scholarships, vision, mission }: Land
               {/* Logo (added before the headline) */}
               <div className="flex justify-center">
                 <Link href={`/${locale}`} className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} gap-2`}>
-                  <img src="/logo.svg" alt="Logo" className="h-50 w-50" />
+                  <img src="/logo.svg" alt="Logo" className="h-60 w-60" />
                 </Link>
               </div>
 
