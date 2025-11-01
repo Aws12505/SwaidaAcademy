@@ -8,30 +8,41 @@ import { Separator } from '@/components/ui/separator';
 import type { BreadcrumbItem } from '@/types';
 import type { Course } from '@/types';
 import { getLevelBadgeColor, formatDate } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 interface ShowCourseProps {
-  course: Course;
+  course: Course & {
+    title: string | { en?: string; ar?: string };
+    description: string | { en?: string; ar?: string };
+  };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/admin/dashboard',
-  },
-  {
-    title: 'Courses',
-    href: '/admin/courses',
-  },
-  {
-    title: 'View',
-    href: '#',
-  },
+  { title: 'Dashboard', href: '/admin/dashboard' },
+  { title: 'Courses', href: '/admin/courses' },
+  { title: 'View', href: '#' },
 ];
 
+const isObj = (v: unknown): v is Record<string, any> =>
+  v !== null && typeof v === 'object' && !Array.isArray(v);
+
 export default function ShowCourse({ course }: ShowCourseProps) {
+  // Normalize multilingual fields
+  const titleEn = isObj(course.title) ? (course.title.en ?? '') : (course.title ?? '');
+  const titleAr = isObj(course.title) ? (course.title.ar ?? '') : '';
+  const descEn  = isObj(course.description) ? (course.description.en ?? '') : (course.description ?? '');
+  const descAr  = isObj(course.description) ? (course.description.ar ?? '') : '';
+
+  const headTitle = titleEn || titleAr || 'Course';
+
+  // Platform/Category names are likely strings (models translate on toArray)
+  // but guard just in case:
+  const nameOf = (maybe: any) =>
+    isObj(maybe) ? (maybe.en ?? maybe.ar ?? '') : (maybe ?? '');
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={course.title} />
+      <Head title={headTitle} />
       
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
         <div className="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
@@ -67,7 +78,7 @@ export default function ShowCourse({ course }: ShowCourseProps) {
                       <div className="aspect-video w-full overflow-hidden rounded-lg">
                         <img
                           src={course.cover_image.image_url}
-                          alt={course.title}
+                          alt={headTitle}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -79,7 +90,14 @@ export default function ShowCourse({ course }: ShowCourseProps) {
                 <Card>
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <CardTitle className="text-2xl">{course.title}</CardTitle>
+                      <CardTitle className="text-2xl">
+                        {titleEn || titleAr || 'Untitled'}
+                        {titleEn && titleAr ? (
+                          <div className="mt-1 text-base text-muted-foreground" dir="rtl">
+                            {titleAr}
+                          </div>
+                        ) : null}
+                      </CardTitle>
                       <Badge className={getLevelBadgeColor(course.level)}>
                         {course.level}
                       </Badge>
@@ -88,10 +106,28 @@ export default function ShowCourse({ course }: ShowCourseProps) {
                   <CardContent className="space-y-4">
                     <div>
                       <h3 className="font-semibold mb-2">Description</h3>
-                      <div 
-                        className="prose prose-sm max-w-none dark:prose-invert"
-                        dangerouslySetInnerHTML={{ __html: course.description }}
-                      />
+
+                      <Tabs defaultValue={descEn ? 'en' : 'ar'}>
+                        <TabsList className="grid w-full grid-cols-2 mb-3">
+                          <TabsTrigger value="en">English</TabsTrigger>
+                          <TabsTrigger value="ar">العربية</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="en">
+                          <div
+                            className="prose prose-sm max-w-none dark:prose-invert"
+                            dangerouslySetInnerHTML={{ __html: descEn || '<p><em>No English content</em></p>' }}
+                          />
+                        </TabsContent>
+
+                        <TabsContent value="ar">
+                          <div
+                            className="prose prose-sm max-w-none dark:prose-invert"
+                            dir="rtl"
+                            dangerouslySetInnerHTML={{ __html: descAr || '<p><em>لا يوجد محتوى عربي</em></p>' }}
+                          />
+                        </TabsContent>
+                      </Tabs>
                     </div>
                   </CardContent>
                 </Card>
@@ -110,7 +146,7 @@ export default function ShowCourse({ course }: ShowCourseProps) {
                             <div key={image.id} className="aspect-video w-full overflow-hidden rounded-lg">
                               <img
                                 src={image.image_url}
-                                alt={course.title}
+                                alt={headTitle}
                                 className="h-full w-full object-cover"
                               />
                             </div>
@@ -123,7 +159,6 @@ export default function ShowCourse({ course }: ShowCourseProps) {
 
               {/* Sidebar */}
               <div className="space-y-6">
-                {/* Details Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Course Information</CardTitle>
@@ -131,14 +166,14 @@ export default function ShowCourse({ course }: ShowCourseProps) {
                   <CardContent className="space-y-4">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Platform</p>
-                      <p className="text-sm font-semibold">{course.platform.name}</p>
+                      <p className="text-sm font-semibold">{nameOf(course.platform?.name)}</p>
                     </div>
                     
                     <Separator />
                     
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Category</p>
-                      <p className="text-sm font-semibold">{course.category.name}</p>
+                      <p className="text-sm font-semibold">{nameOf(course.category?.name)}</p>
                     </div>
                     
                     <Separator />
@@ -155,7 +190,14 @@ export default function ShowCourse({ course }: ShowCourseProps) {
                     
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Certificate</p>
-                      <Badge variant="outline" className={course.have_certificate ? 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300' : 'bg-gray-50 text-gray-700 dark:bg-gray-950 dark:text-gray-300'}>
+                      <Badge
+                        variant="outline"
+                        className={
+                          course.have_certificate
+                            ? 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
+                            : 'bg-gray-50 text-gray-700 dark:bg-gray-950 dark:text-gray-300'
+                        }
+                      >
                         {course.have_certificate ? 'Available' : 'Not Available'}
                       </Badge>
                     </div>

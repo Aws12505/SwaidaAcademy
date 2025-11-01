@@ -4,40 +4,41 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import type { BreadcrumbItem } from '@/types';
-import type { Blog } from '@/types';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import type { BreadcrumbItem, Blog } from '@/types';
 import { formatDate } from '@/lib/utils';
 
 interface ShowBlogProps {
-  blog: Blog;
+  blog: Blog & {
+    // ensure types allow objects here
+    title: string | { en?: string; ar?: string };
+    content: string | { en?: string; ar?: string };
+  };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/admin/dashboard',
-  },
-  {
-    title: 'Blogs',
-    href: '/admin/blogs',
-  },
-  {
-    title: 'View',
-    href: '#',
-  },
+  { title: 'Dashboard', href: '/admin/dashboard' },
+  { title: 'Blogs', href: '/admin/blogs' },
+  { title: 'View', href: '#' },
 ];
 
+const isObj = (v: unknown): v is Record<string, any> =>
+  v !== null && typeof v === 'object' && !Array.isArray(v);
+
 export default function ShowBlog({ blog }: ShowBlogProps) {
-  const getTitle = (title: any): string => {
-    if (typeof title === 'string') return title;
-    if (typeof title === 'object' && title.en) return title.en;
-    return 'Blog';
-  };
+  // normalize title/content to strings per locale
+  const titleEn = isObj(blog.title) ? (blog.title.en ?? '') : (blog.title ?? '');
+  const titleAr = isObj(blog.title) ? (blog.title.ar ?? '') : '';
+  const contentEn = isObj(blog.content) ? (blog.content.en ?? '') : (blog.content ?? '');
+  const contentAr = isObj(blog.content) ? (blog.content.ar ?? '') : '';
+
+  // Choose something stringy for <Head> and alt attributes
+  const headTitle = titleEn || titleAr || 'Blog';
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={getTitle(blog.title)} />
-      
+      <Head title={headTitle} />
+
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
         <div className="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
           <div className="p-6">
@@ -72,7 +73,7 @@ export default function ShowBlog({ blog }: ShowBlogProps) {
                       <div className="aspect-[21/9] w-full overflow-hidden rounded-lg">
                         <img
                           src={blog.cover_image.image_url}
-                          alt={blog.title}
+                          alt={headTitle}
                           className="h-full w-full object-cover"
                         />
                       </div>
@@ -83,22 +84,50 @@ export default function ShowBlog({ blog }: ShowBlogProps) {
                 {/* Title & Content */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-2xl">{blog.title}</CardTitle>
+                    {/* Render a safe string, optionally show both */}
+                    <CardTitle className="text-2xl">
+                      {titleEn || titleAr || 'Untitled'}
+                      {titleAr && titleEn && (
+                        <div className="mt-1 text-base text-muted-foreground" dir="rtl">
+                          {titleAr}
+                        </div>
+                      )}
+                    </CardTitle>
                   </CardHeader>
+
                   <CardContent className="space-y-4">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
                       {formatDate(blog.created_at, 'en')}
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div>
                       <h3 className="font-semibold mb-2">Content</h3>
-                      <div 
-                        className="prose prose-sm max-w-none dark:prose-invert"
-                        dangerouslySetInnerHTML={{ __html: blog.content }}
-                      />
+
+                      {/* Tabs to view both languages */}
+                      <Tabs defaultValue={contentEn ? 'en' : 'ar'}>
+                        <TabsList className="grid w-full grid-cols-2 mb-3">
+                          <TabsTrigger value="en">English</TabsTrigger>
+                          <TabsTrigger value="ar">العربية</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="en">
+                          <div
+                            className="prose prose-sm max-w-none dark:prose-invert"
+                            dangerouslySetInnerHTML={{ __html: contentEn || '<p><em>No English content</em></p>' }}
+                          />
+                        </TabsContent>
+
+                        <TabsContent value="ar">
+                          <div
+                            className="prose prose-sm max-w-none dark:prose-invert"
+                            dir="rtl"
+                            dangerouslySetInnerHTML={{ __html: contentAr || '<p><em>لا يوجد محتوى عربي</em></p>' }}
+                          />
+                        </TabsContent>
+                      </Tabs>
                     </div>
                   </CardContent>
                 </Card>
@@ -117,7 +146,7 @@ export default function ShowBlog({ blog }: ShowBlogProps) {
                             <div key={image.id} className="aspect-video w-full overflow-hidden rounded-lg">
                               <img
                                 src={image.image_url}
-                                alt={blog.title}
+                                alt={headTitle}
                                 className="h-full w-full object-cover"
                               />
                             </div>
@@ -130,7 +159,6 @@ export default function ShowBlog({ blog }: ShowBlogProps) {
 
               {/* Sidebar */}
               <div className="space-y-6">
-                {/* Metadata Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Post Information</CardTitle>
@@ -140,16 +168,16 @@ export default function ShowBlog({ blog }: ShowBlogProps) {
                       <p className="text-sm font-medium text-muted-foreground">Created</p>
                       <p className="text-sm font-semibold">{formatDate(blog.created_at, 'en')}</p>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
                       <p className="text-sm font-semibold">{formatDate(blog.updated_at, 'en')}</p>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Total Images</p>
                       <p className="text-sm font-semibold">{blog.images?.length || 0}</p>

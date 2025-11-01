@@ -66,7 +66,7 @@ class BlogController extends Controller
 
     public function update(UpdateBlogRequest $request, string $id): RedirectResponse
     {
-        $this->blogService->updateBlog((int)$id, $request->validated());
+            $this->blogService->updateBlog((int)$id, $request->validated());
         return redirect()->route('admin.blogs.index')->with('success', 'Blog updated successfully.');
     }
 

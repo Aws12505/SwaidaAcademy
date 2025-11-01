@@ -18,7 +18,7 @@ class VisionController extends Controller
         if (!$vision) {
             // Create a default vision if none exists
             $vision = Vision::create([
-                'content' => json_encode(['en' => '', 'ar' => ''])
+                'content' => ['en' => '', 'ar' => '']
             ]);
         }
 
@@ -43,11 +43,11 @@ class VisionController extends Controller
 
         if (!$vision) {
             Vision::create([
-                'content' => json_encode($request->input('content'))
+                'content' => $request->input('content')
             ]);
         } else {
             $vision->update([
-                'content' => json_encode($request->input('content'))
+                'content' => $request->input('content')
             ]);
         }
 

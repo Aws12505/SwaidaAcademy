@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 // shadcn/ui
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,13 @@ export interface QuillEditorProProps {
   blogId?: number;
 }
 
-type ToolbarModule = { addHandler: (format: string, handler: (value?: any) => void) => void; };
+type ToolbarModule = { addHandler: (format: string, handler: (value?: any) => void) => void };
+
+// 🔐 helper to read the CSRF token from <meta name="csrf-token">
+function getCsrfToken() {
+  const meta = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null;
+  return meta?.content ?? null;
+}
 
 const QuillEditorPro: React.FC<QuillEditorProProps> = ({
   value,
@@ -63,7 +69,7 @@ const QuillEditorPro: React.FC<QuillEditorProProps> = ({
       formats: [
         'bold','italic','underline','strike','color','background',
         'font','size','script','link','code',
-        'header','blockquote','code-block','list','bullet',
+        'header','blockquote','code-block','list',
         'indent','align','direction','image','video',
       ],
     });
@@ -132,13 +138,31 @@ const QuillEditorPro: React.FC<QuillEditorProProps> = ({
     if (draftToken) fd.append('draft_token', draftToken);
     fd.append('is_inline', '1');
 
+    // ✅ add CSRF header so Laravel stops 419-ing
+    const token = getCsrfToken();
+
     const res = await fetch('/admin/uploads/images', {
       method: 'POST',
       body: fd,
       credentials: 'same-origin',
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        ...(token ? { 'X-CSRF-TOKEN': token } : {}),
+      },
     });
-    if (!res.ok) return;
+
+    if (!res.ok) {
+      // keep your behavior (no throw), but log real reason
+      try {
+        const ct = res.headers.get('content-type') ?? '';
+        const body = ct.includes('application/json') ? await res.json() : await res.text();
+        console.error('Image upload failed:', { status: res.status, statusText: res.statusText, body });
+      } catch (e) {
+        console.error('Image upload failed:', res.status, res.statusText);
+      }
+      return;
+    }
+
     const { image_url } = await res.json();
 
     const quill = quillRef.current!;
@@ -157,10 +181,14 @@ const QuillEditorPro: React.FC<QuillEditorProProps> = ({
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        {/* 👇 mute the Radix warning without changing your UI */}
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Insert image</DialogTitle>
           </DialogHeader>
+                <DialogDescription>
+        Upload a new image or choose one from your gallery.
+      </DialogDescription>
           <Tabs value={activeTab} onValueChange={(v:any)=>setActiveTab(v)}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="upload">Upload</TabsTrigger>

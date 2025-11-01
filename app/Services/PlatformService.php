@@ -8,32 +8,26 @@ use Illuminate\Database\Eloquent\Collection;
 class PlatformService
 {
     /**
-     * Get all platforms
+     * Get all platforms with item counts
      */
     public function getAllPlatforms(): Collection
     {
-        return Platform::all();
+        return Platform::withCount(['courses', 'scholarships'])->get();
     }
 
     /**
-     * Get platform by ID
+     * Get platform by ID with counts
      */
     public function getPlatformById(int $id): Platform
     {
-        return Platform::findOrFail($id);
+        return Platform::withCount(['courses', 'scholarships'])->findOrFail($id);
     }
 
-    /**
-     * Create new platform
-     */
     public function createPlatform(array $data): Platform
     {
         return Platform::create($data);
     }
 
-    /**
-     * Update platform
-     */
     public function updatePlatform(int $id, array $data): Platform
     {
         $platform = Platform::findOrFail($id);
@@ -41,9 +35,6 @@ class PlatformService
         return $platform;
     }
 
-    /**
-     * Delete platform
-     */
     public function deletePlatform(int $id): bool
     {
         $platform = Platform::findOrFail($id);

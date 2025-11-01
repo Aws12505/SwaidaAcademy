@@ -17,12 +17,16 @@ class UpdateBlogRequest extends FormRequest
             'title' => 'sometimes|required|array',
             'title.en' => 'sometimes|required|string|max:255',
             'title.ar' => 'sometimes|required|string|max:255',
+
             'content' => 'sometimes|required|array',
             'content.en' => 'sometimes|required|string',
             'content.ar' => 'sometimes|required|string',
-            'images' => 'nullable|array|max:10',
+
+            // Validate images only when present; do NOT require sending an empty array
+            'images' => 'sometimes|array|max:10',
             'images.*.file' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'images.*.is_cover' => 'boolean',
+
             'draft_token' => ['nullable','string','max:100'],
         ];
     }

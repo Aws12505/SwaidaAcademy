@@ -8,19 +8,19 @@ use Illuminate\Database\Eloquent\Collection;
 class CategoryService
 {
     /**
-     * Get all categories
+     * Get all categories (with counts)
      */
     public function getAllCategories(): Collection
     {
-        return Category::all();
+        return Category::withCount(['courses', 'scholarships'])->get();
     }
 
     /**
-     * Get category by ID
+     * Get category by ID (with counts)
      */
     public function getCategoryById(int $id): Category
     {
-        return Category::findOrFail($id);
+        return Category::withCount(['courses', 'scholarships'])->findOrFail($id);
     }
 
     /**

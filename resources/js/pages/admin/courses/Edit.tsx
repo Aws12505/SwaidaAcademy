@@ -30,24 +30,15 @@ interface EditCourseProps {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/admin/dashboard',
-  },
-  {
-    title: 'Courses',
-    href: '/admin/courses',
-  },
-  {
-    title: 'Edit',
-    href: '#',
-  },
+  { title: 'Dashboard', href: '/admin/dashboard' },
+  { title: 'Courses', href: '/admin/courses' },
+  { title: 'Edit', href: '#' },
 ];
 
 export default function EditCourse({ course, platforms, categories, levels }: EditCourseProps) {
   const [imageFiles, setImageFiles] = useState<Array<{ file: File; is_cover: boolean; preview: string }>>([]);
 
-  const { data, setData, put, processing, errors } = useForm<{
+  const { data, setData, post, processing, errors } = useForm<{
     title: { en: string; ar: string };
     description: { en: string; ar: string };
     external_url: string;
@@ -56,7 +47,7 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
     category_id: string;
     have_certificate: boolean;
     level: string;
-    images: Array<{ file: File; is_cover: boolean }>;
+    images?: Array<{ file: File; is_cover: boolean }>;
   }>({
     title: course.title,
     description: course.description,
@@ -66,38 +57,56 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
     category_id: course.category_id.toString(),
     have_certificate: course.have_certificate,
     level: course.level,
-    images: [],
   });
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const newImages = files.map((file, index) => ({
+    if (!files.length) return;
+
+    const newImages = files.map((file, idx) => ({
       file,
-      is_cover: imageFiles.length === 0 && index === 0,
+      is_cover: imageFiles.length === 0 && idx === 0,
       preview: URL.createObjectURL(file),
     }));
-    setImageFiles([...imageFiles, ...newImages]);
-    setData('images', [...imageFiles, ...newImages]);
+    const combined = [...imageFiles, ...newImages];
+    setImageFiles(combined);
+
+    // Only send file + is_cover (no preview)
+    setData('images', combined.map(({ file, is_cover }) => ({ file, is_cover })));
   };
 
   const removeImage = (index: number) => {
-    const newImages = imageFiles.filter((_, i) => i !== index);
-    setImageFiles(newImages);
-    setData('images', newImages);
+    const next = imageFiles.filter((_, i) => i !== index);
+    setImageFiles(next);
+    if (next.length) {
+      setData('images', next.map(({ file, is_cover }) => ({ file, is_cover })));
+    } else {
+      setData('images', undefined as any);
+    }
   };
 
   const setCoverImage = (index: number) => {
-    const newImages = imageFiles.map((img, i) => ({
-      ...img,
-      is_cover: i === index,
-    }));
-    setImageFiles(newImages);
-    setData('images', newImages);
+    const next = imageFiles.map((img, i) => ({ ...img, is_cover: i === index }));
+    setImageFiles(next);
+    if (next.length) {
+      setData('images', next.map(({ file, is_cover }) => ({ file, is_cover })));
+    }
   };
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    put(`/admin/courses/${course.id}`);
+
+    // If no new images picked, don’t send images field at all
+    if (imageFiles.length === 0) {
+      setData('images', undefined as any);
+    }
+
+    // POST to a custom update endpoint that accepts multipart/form-data
+    post(`/admin/courses/${course.id}/update`, {
+      forceFormData: true,
+      preserveScroll: true,
+      onError: (errs) => console.error('Update errors:', errs),
+    });
   };
 
   return (
@@ -125,21 +134,12 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
               {/* Current Images */}
               {course.images && course.images.length > 0 && (
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Current Images</CardTitle>
-                  </CardHeader>
+                  <CardHeader><CardTitle>Current Images</CardTitle></CardHeader>
                   <CardContent>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {course.images.map((img) => (
-                        <div
-                          key={img.id}
-                          className="relative aspect-video overflow-hidden rounded-lg border"
-                        >
-                          <img
-                            src={img.image_url}
-                            alt="Course"
-                            className="h-full w-full object-cover"
-                          />
+                        <div key={img.id} className="relative aspect-video overflow-hidden rounded-lg border">
+                          <img src={img.image_url} alt="Course" className="h-full w-full object-cover" />
                           {img.is_cover && (
                             <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
                               Cover
@@ -154,11 +154,9 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
 
               {/* Basic Information */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Basic Information</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Title Tabs */}
+                  {/* Title */}
                   <div className="space-y-2">
                     <Label>Title *</Label>
                     <Tabs defaultValue="en">
@@ -199,56 +197,36 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
                       onChange={(e) => setData('external_url', e.target.value)}
                       placeholder="https://example.com/course"
                     />
-                    {errors.external_url && (
-                      <p className="text-sm text-destructive">{errors.external_url}</p>
-                    )}
+                    {errors.external_url && <p className="text-sm text-destructive">{errors.external_url}</p>}
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     {/* Platform */}
                     <div className="space-y-2">
                       <Label htmlFor="platform_id">Platform *</Label>
-                      <Select
-                        value={data.platform_id}
-                        onValueChange={(value) => setData('platform_id', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select platform" />
-                        </SelectTrigger>
+                      <Select value={data.platform_id} onValueChange={(v) => setData('platform_id', v)}>
+                        <SelectTrigger><SelectValue placeholder="Select platform" /></SelectTrigger>
                         <SelectContent>
-                          {platforms.map((platform) => (
-                            <SelectItem key={platform.id} value={platform.id.toString()}>
-                              {platform.name}
-                            </SelectItem>
+                          {platforms.map((p) => (
+                            <SelectItem key={p.id} value={p.id.toString()}>{p.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      {errors.platform_id && (
-                        <p className="text-sm text-destructive">{errors.platform_id}</p>
-                      )}
+                      {errors.platform_id && <p className="text-sm text-destructive">{errors.platform_id}</p>}
                     </div>
 
                     {/* Category */}
                     <div className="space-y-2">
                       <Label htmlFor="category_id">Category *</Label>
-                      <Select
-                        value={data.category_id}
-                        onValueChange={(value) => setData('category_id', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
+                      <Select value={data.category_id} onValueChange={(v) => setData('category_id', v)}>
+                        <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                         <SelectContent>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id.toString()}>
-                              {category.name}
-                            </SelectItem>
+                          {categories.map((c) => (
+                            <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      {errors.category_id && (
-                        <p className="text-sm text-destructive">{errors.category_id}</p>
-                      )}
+                      {errors.category_id && <p className="text-sm text-destructive">{errors.category_id}</p>}
                     </div>
                   </div>
 
@@ -256,24 +234,15 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
                     {/* Level */}
                     <div className="space-y-2">
                       <Label htmlFor="level">Level *</Label>
-                      <Select
-                        value={data.level}
-                        onValueChange={(value) => setData('level', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select level" />
-                        </SelectTrigger>
+                      <Select value={data.level} onValueChange={(v) => setData('level', v)}>
+                        <SelectTrigger><SelectValue placeholder="Select level" /></SelectTrigger>
                         <SelectContent>
-                          {levels.map((level) => (
-                            <SelectItem key={level.value} value={level.value}>
-                              {level.label}
-                            </SelectItem>
+                          {levels.map((l) => (
+                            <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      {errors.level && (
-                        <p className="text-sm text-destructive">{errors.level}</p>
-                      )}
+                      {errors.level && <p className="text-sm text-destructive">{errors.level}</p>}
                     </div>
 
                     {/* Duration */}
@@ -307,11 +276,9 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
                 </CardContent>
               </Card>
 
-              {/* Description with Quill Editor */}
+              {/* Description */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Description *</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Description *</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
                   <Tabs defaultValue="en">
                     <TabsList className="grid w-full grid-cols-2">
@@ -321,7 +288,7 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
                     <TabsContent value="en">
                       <QuillEditorPro
                         value={data.description.en}
-                        onChange={(content) => setData('description', { ...data.description, en: content })}
+                        onChange={(html) => setData('description', { ...data.description, en: html })}
                         placeholder="Enter course description in English..."
                         height="400px"
                       />
@@ -329,7 +296,7 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
                     <TabsContent value="ar">
                       <QuillEditorPro
                         value={data.description.ar}
-                        onChange={(content) => setData('description', { ...data.description, ar: content })}
+                        onChange={(html) => setData('description', { ...data.description, ar: html })}
                         placeholder="أدخل وصف الدورة بالعربية..."
                         height="400px"
                       />
@@ -345,62 +312,30 @@ export default function EditCourse({ course, platforms, categories, levels }: Ed
 
               {/* New Images */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Upload New Images</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Upload New Images</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="images">Upload Images</Label>
                     <div className="flex items-center gap-4">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => document.getElementById('images')?.click()}
-                      >
+                      <Button type="button" variant="outline" onClick={() => document.getElementById('images')?.click()}>
                         <Upload className="mr-2 h-4 w-4" />
                         Choose Files
                       </Button>
-                      <input
-                        id="images"
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {imageFiles.length} file(s) selected
-                      </span>
+                      <input id="images" type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
+                      <span className="text-sm text-muted-foreground">{imageFiles.length} file(s) selected</span>
                     </div>
                   </div>
 
                   {imageFiles.length > 0 && (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {imageFiles.map((img, index) => (
-                        <div
-                          key={index}
-                          className="relative group aspect-video overflow-hidden rounded-lg border"
-                        >
-                          <img
-                            src={img.preview}
-                            alt={`Upload ${index + 1}`}
-                            className="h-full w-full object-cover"
-                          />
+                      {imageFiles.map((img, i) => (
+                        <div key={i} className="relative group aspect-video overflow-hidden rounded-lg border">
+                          <img src={img.preview} alt={`Upload ${i + 1}`} className="h-full w-full object-cover" />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant={img.is_cover ? 'default' : 'secondary'}
-                              onClick={() => setCoverImage(index)}
-                            >
+                            <Button type="button" size="sm" variant={img.is_cover ? 'default' : 'secondary'} onClick={() => setCoverImage(i)}>
                               {img.is_cover ? 'Cover' : 'Set Cover'}
                             </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => removeImage(index)}
-                            >
+                            <Button type="button" size="sm" variant="destructive" onClick={() => removeImage(i)}>
                               <X className="h-4 w-4" />
                             </Button>
                           </div>

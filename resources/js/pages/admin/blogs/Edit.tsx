@@ -26,54 +26,87 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function EditBlog({ blog }: EditBlogProps) {
+  // Local previews for newly picked files
   const [imageFiles, setImageFiles] = useState<Array<{ file: File; is_cover: boolean; preview: string }>>([]);
 
-  const { data, setData, put, processing, errors } = useForm<{
+  // NOTE: images is OPTIONAL now — we won't send it unless user picks files
+  const { data, setData, post, processing, errors } = useForm<{
     title: { en: string; ar: string };
     content: { en: string; ar: string };
-    images: Array<{ file: File; is_cover: boolean }>;
+    images?: Array<{ file: File; is_cover: boolean }>;
     draft_token?: string;
   }>({
     title: blog.title,
     content: blog.content,
-    images: [],
     draft_token: undefined,
   });
-useEffect(() => {
-  if (!(data as any).draft_token) setData('draft_token', uuid());
-}, []);
+
+  // Ensure we have a draft token (for inline dialog uploads mapping)
+  useEffect(() => {
+    if (!(data as any).draft_token) setData('draft_token', uuid());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
     const newImages = files.map((file, index) => ({
       file,
       is_cover: imageFiles.length === 0 && index === 0,
       preview: URL.createObjectURL(file),
     }));
-    setImageFiles([...imageFiles, ...newImages]);
-    setData('images', [...imageFiles, ...newImages]);
+
+    const combined = [...imageFiles, ...newImages];
+    setImageFiles(combined);
+
+    // Only include images in the payload when we actually have some
+    setData('images', combined.map(({ file, is_cover }) => ({ file, is_cover })));
   };
 
   const removeImage = (index: number) => {
     const newImages = imageFiles.filter((_, i) => i !== index);
     setImageFiles(newImages);
-    setData('images', newImages);
+
+    if (newImages.length > 0) {
+      setData(
+        'images',
+        newImages.map(({ file, is_cover }) => ({ file, is_cover }))
+      );
+    } else {
+      // Remove the key from the payload — do NOT send empty array
+      setData('images', undefined as any);
+    }
   };
 
   const setCoverImage = (index: number) => {
     const newImages = imageFiles.map((img, i) => ({ ...img, is_cover: i === index }));
     setImageFiles(newImages);
-    setData('images', newImages);
+
+    // keep payload in sync (only if we have files)
+    if (newImages.length > 0) {
+      setData(
+        'images',
+        newImages.map(({ file, is_cover }) => ({ file, is_cover }))
+      );
+    }
   };
 
   const submit: FormEventHandler = (e) => {
     e.preventDefault();
-    put(`/admin/blogs/${blog.id}`);
+
+    // If user didn’t pick any new files, remove images from payload entirely
+    if (imageFiles.length === 0) {
+      setData('images', undefined as any);
+    }
+
+    post(`/admin/blogs/${blog.id}/update`);
   };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`Edit: ${blog.title.en || 'Blog'}`} />
-      
+
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
         <div className="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
           <div className="p-6">
@@ -83,14 +116,19 @@ useEffect(() => {
                 <p className="text-muted-foreground">Update blog post information</p>
               </div>
               <Button asChild variant="outline">
-                <Link href="/admin/blogs"><ArrowLeft className="mr-2 h-4 w-4" />Back</Link>
+                <Link href="/admin/blogs">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Link>
               </Button>
             </div>
 
             <form onSubmit={submit} className="space-y-6">
               {blog.images && blog.images.length > 0 && (
                 <Card>
-                  <CardHeader><CardTitle>Current Images</CardTitle></CardHeader>
+                  <CardHeader>
+                    <CardTitle>Current Images</CardTitle>
+                  </CardHeader>
                   <CardContent>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {blog.images.map((img) => (
@@ -109,7 +147,9 @@ useEffect(() => {
               )}
 
               <Card>
-                <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle>Basic Information</CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Title *</Label>
@@ -144,7 +184,9 @@ useEffect(() => {
               </Card>
 
               <Card>
-                <CardHeader><CardTitle>Content *</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle>Content *</CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-4">
                   <Tabs defaultValue="en">
                     <TabsList className="grid w-full grid-cols-2">
@@ -177,15 +219,29 @@ useEffect(() => {
               </Card>
 
               <Card>
-                <CardHeader><CardTitle>Upload New Images</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle>Upload New Images</CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Upload Images</Label>
                     <div className="flex items-center gap-4">
-                      <Button type="button" variant="outline" onClick={() => document.getElementById('images')?.click()}>
-                        <Upload className="mr-2 h-4 w-4" />Choose Files
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('images')?.click()}
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Choose Files
                       </Button>
-                      <input id="images" type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
+                      <input
+                        id="images"
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
                       <span className="text-sm text-muted-foreground">{imageFiles.length} file(s) selected</span>
                     </div>
                   </div>
@@ -196,7 +252,12 @@ useEffect(() => {
                         <div key={index} className="relative group aspect-video overflow-hidden rounded-lg border">
                           <img src={img.preview} alt={`Upload ${index + 1}`} className="h-full w-full object-cover" />
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                            <Button type="button" size="sm" variant={img.is_cover ? 'default' : 'secondary'} onClick={() => setCoverImage(index)}>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={img.is_cover ? 'default' : 'secondary'}
+                              onClick={() => setCoverImage(index)}
+                            >
                               {img.is_cover ? 'Cover' : 'Set Cover'}
                             </Button>
                             <Button type="button" size="sm" variant="destructive" onClick={() => removeImage(index)}>
@@ -213,8 +274,12 @@ useEffect(() => {
               <Separator />
 
               <div className="flex justify-end gap-4">
-                <Button type="button" variant="outline" asChild><Link href="/admin/blogs">Cancel</Link></Button>
-                <Button type="submit" disabled={processing}>{processing ? 'Updating...' : 'Update Blog Post'}</Button>
+                <Button type="button" variant="outline" asChild>
+                  <Link href="/admin/blogs">Cancel</Link>
+                </Button>
+                <Button type="submit" disabled={processing}>
+                  {processing ? 'Updating...' : 'Update Blog Post'}
+                </Button>
               </div>
             </form>
           </div>

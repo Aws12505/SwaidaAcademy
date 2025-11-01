@@ -18,7 +18,7 @@ class MissionController extends Controller
         if (!$mission) {
             // Create a default mission if none exists
             $mission = Mission::create([
-                'content' => json_encode(['en' => '', 'ar' => ''])
+                'content' => ['en' => '', 'ar' => '']
             ]);
         }
 
@@ -43,11 +43,11 @@ class MissionController extends Controller
 
         if (!$mission) {
             Mission::create([
-                'content' => json_encode($request->input('content'))
+                'content' => $request->input('content')
             ]);
         } else {
             $mission->update([
-                'content' => json_encode($request->input('content'))
+                'content' => $request->input('content')
             ]);
         }
 

@@ -35,24 +35,28 @@ class CategoryController extends Controller
 
     public function show(string $id): Response
     {
-        $categoryRaw = Category::findOrFail((int)$id);
+        $categoryRaw = Category::withCount(['courses','scholarships'])->findOrFail((int)$id);
 
         return Inertia::render('admin/categories/Show', [
             'category' => [
                 'id' => $categoryRaw->id,
-                'name' => json_decode($categoryRaw->getAttributes()['name'], true),
+                'name' => json_decode($categoryRaw->getAttributes()['name'], true), // keep both langs
+                'courses_count' => $categoryRaw->courses_count,
+                'scholarships_count' => $categoryRaw->scholarships_count,
             ],
         ]);
     }
 
     public function edit(string $id): Response
     {
-        $categoryRaw = Category::findOrFail((int)$id);
+        $categoryRaw = Category::withCount(['courses','scholarships'])->findOrFail((int)$id);
 
         return Inertia::render('admin/categories/Edit', [
             'category' => [
                 'id' => $categoryRaw->id,
                 'name' => json_decode($categoryRaw->getAttributes()['name'], true),
+                'courses_count' => $categoryRaw->courses_count,
+                'scholarships_count' => $categoryRaw->scholarships_count,
             ],
         ]);
     }

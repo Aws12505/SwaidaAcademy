@@ -68,14 +68,24 @@ Route::prefix('admin')->name('admin.')->middleware(['set.locale','auth','admin']
     // Users
     Route::resource('users', App\Http\Controllers\Admin\UserController::class);
 
+    Route::post('/courses/{course}/update', [\App\Http\Controllers\Admin\CourseController::class, 'update'])
+    ->name('courses.update.post');
+
     // Courses
-    Route::resource('courses', App\Http\Controllers\Admin\CourseController::class);
+    Route::resource('courses', App\Http\Controllers\Admin\CourseController::class)->except('update');
     
+    Route::post('/scholarships/{scholarship}/update', [\App\Http\Controllers\Admin\ScholarshipController::class, 'update'])
+    ->name('scholarships.update.post');
+
     // Scholarships
-    Route::resource('scholarships', App\Http\Controllers\Admin\ScholarshipController::class);
+    Route::resource('scholarships', App\Http\Controllers\Admin\ScholarshipController::class)->except('update');
     
     // Blogs
-    Route::resource('blogs', App\Http\Controllers\Admin\BlogController::class);
+    // routes/web.php (inside the admin group)
+Route::post('/blogs/{blog}/update', [\App\Http\Controllers\Admin\BlogController::class, 'update'])
+    ->name('blogs.update.post');
+
+    Route::resource('blogs', App\Http\Controllers\Admin\BlogController::class)->except('update');
     
     // Platforms
     Route::resource('platforms', App\Http\Controllers\Admin\PlatformController::class);

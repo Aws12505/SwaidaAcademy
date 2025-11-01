@@ -5,32 +5,40 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import type { BreadcrumbItem } from '@/types';
-import type { Platform } from '@/types';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
+type Translatable = string | { en?: string; ar?: string };
 
 interface ShowPlatformProps {
-  platform: Platform;
+  platform: {
+    id: number;
+    name: Translatable;
+    courses_count?: number;
+    scholarships_count?: number;
+  };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/admin/dashboard',
-  },
-  {
-    title: 'Platforms',
-    href: '/admin/platforms',
-  },
-  {
-    title: 'View',
-    href: '#',
-  },
+  { title: 'Dashboard', href: '/admin/dashboard' },
+  { title: 'Platforms', href: '/admin/platforms' },
+  { title: 'View', href: '#' },
 ];
 
+const isObj = (v: unknown): v is Record<string, any> =>
+  v !== null && typeof v === 'object' && !Array.isArray(v);
+
 export default function ShowPlatform({ platform }: ShowPlatformProps) {
+  const nameEn = isObj(platform.name) ? (platform.name.en ?? '') : (platform.name ?? '');
+  const nameAr = isObj(platform.name) ? (platform.name.ar ?? '') : '';
+  const headTitle = nameEn || nameAr || 'Platform';
+
+  const coursesCount = platform.courses_count ?? 0;
+  const scholarshipsCount = platform.scholarships_count ?? 0;
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={platform.name} />
-      
+      <Head title={headTitle} />
+
       <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
         <div className="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
           <div className="p-6">
@@ -65,26 +73,40 @@ export default function ShowPlatform({ platform }: ShowPlatformProps) {
                     <p className="text-sm font-medium text-muted-foreground">ID</p>
                     <p className="text-sm font-semibold">{platform.id}</p>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Name</p>
-                    <p className="text-lg font-semibold">{platform.name}</p>
+
+                    {/* show both languages safely, like your blog/category show pages */}
+                    <Tabs defaultValue={nameEn ? 'en' : 'ar'} className="mt-2">
+                      <TabsList className="grid w-full max-w-xs grid-cols-2">
+                        <TabsTrigger value="en">English</TabsTrigger>
+                        <TabsTrigger value="ar">العربية</TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="en">
+                        <p className="text-lg font-semibold">{nameEn || '—'}</p>
+                      </TabsContent>
+                      <TabsContent value="ar">
+                        <p className="text-lg font-semibold" dir="rtl">{nameAr || '—'}</p>
+                      </TabsContent>
+                    </Tabs>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Associated Items</p>
                     <div className="mt-2 space-y-2">
                       <div className="flex items-center justify-between text-sm">
                         <span>Courses</span>
-                        <span className="font-semibold">0</span>
+                        <span className="font-semibold">{coursesCount}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span>Scholarships</span>
-                        <span className="font-semibold">0</span>
+                        <span className="font-semibold">{scholarshipsCount}</span>
                       </div>
                     </div>
                   </div>

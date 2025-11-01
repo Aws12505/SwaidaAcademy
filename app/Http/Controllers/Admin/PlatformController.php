@@ -35,24 +35,28 @@ class PlatformController extends Controller
 
     public function show(string $id): Response
     {
-        $platformRaw = Platform::findOrFail((int)$id);
+        $platformRaw = Platform::withCount(['courses', 'scholarships'])->findOrFail((int)$id);
 
         return Inertia::render('admin/platforms/Show', [
             'platform' => [
                 'id' => $platformRaw->id,
-                'name' => json_decode($platformRaw->getAttributes()['name'], true),
+                'name' => json_decode($platformRaw->getAttributes()['name'], true), // pass both langs
+                'courses_count' => $platformRaw->courses_count,
+                'scholarships_count' => $platformRaw->scholarships_count,
             ],
         ]);
     }
 
     public function edit(string $id): Response
     {
-        $platformRaw = Platform::findOrFail((int)$id);
+        $platformRaw = Platform::withCount(['courses', 'scholarships'])->findOrFail((int)$id);
 
         return Inertia::render('admin/platforms/Edit', [
             'platform' => [
                 'id' => $platformRaw->id,
                 'name' => json_decode($platformRaw->getAttributes()['name'], true),
+                'courses_count' => $platformRaw->courses_count,
+                'scholarships_count' => $platformRaw->scholarships_count,
             ],
         ]);
     }
