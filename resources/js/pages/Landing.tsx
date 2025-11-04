@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import type { PageProps, Course, Scholarship, Vision, Mission, PaginatedData } from '@/types';
 import { useRTL } from '@/hooks/useRTL';
 import ScrollReveal from '@/components/motion/ScrollReveal';
+import ContactUsCard from '@/components/contact/ContactUsCard';
 
 interface LandingProps extends PageProps {
   courses: PaginatedData<Course>;
@@ -183,7 +184,12 @@ export default function Landing({ courses, scholarships, vision, mission }: Land
           </div>
         </div>
       </section>
-
+{/* Contact Us (NEW – after vision/mission, before CTA/footer) */}
+      <section>
+        <div className="container-responsive max-w-7xl mx-auto py-10 sm:py-14 lg:py-20">
+          <ContactUsCard />
+        </div>
+      </section>
       {/* CTA */}
       <section className="bg-gradient-to-br from-primary to-secondary">
         <div className="container-responsive max-w-7xl mx-auto py-12 sm:py-16 lg:py-20">

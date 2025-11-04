@@ -14,6 +14,7 @@ import {
   Eye,
   Newspaper,
   Users,
+  Contact
 } from "lucide-react";
 import AppLogo from './app-logo';
 
@@ -72,6 +73,12 @@ const mainNavItems: NavItem[] = [
     icon: Users,
     group: 'General',
   },
+  {
+    title: 'Contact Us Entries',
+    href: '/admin/contact-messages',
+    icon: Contact,
+    group: 'General'
+  }
 ];
 
 const footerNavItems: NavItem[] = [

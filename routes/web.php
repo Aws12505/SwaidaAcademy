@@ -5,6 +5,8 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 
 // Localized Routes for Frontend
 Route::prefix('{locale}')->where(['locale' => 'en|ar'])
@@ -17,6 +19,8 @@ Route::prefix('{locale}')->where(['locale' => 'en|ar'])
         Route::post('/scholarships/{scholarship}/access', [App\Http\Controllers\Admin\UserController::class, 'pressScholarshipAccess'])
             ->name('scholarships.access');
         });
+        Route::post('/contact', [ContactMessageController::class, 'store'])->name('contact.store');
+
         // Landing Page
         Route::get('/', [LandingController::class, 'index'])->name('landing');
         
@@ -107,6 +111,9 @@ Route::post('/blogs/{blog}/update', [\App\Http\Controllers\Admin\BlogController:
         ->name('uploads.images.index'); // list for gallery dialog
     Route::delete('/uploads/images/{imageGallery}', [\App\Http\Controllers\Admin\UploadController::class, 'destroy'])
         ->name('uploads.images.destroy');
+
+    Route::resource('contact-messages', AdminContactMessageController::class)->only(['index','destroy']);
+
 });
 
 // Default redirect to English

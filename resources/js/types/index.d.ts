@@ -163,3 +163,12 @@ export type PageProps<T extends Record<string, any> = Record<string, any>> = T &
   locale: string;
 };
 
+export type ContactMessage = {
+  id: number;
+  full_name: string;
+  whatsapp_number: string;
+  email?: string | null;
+  message: string;
+  created_at: string;
+  updated_at?: string;
+};
