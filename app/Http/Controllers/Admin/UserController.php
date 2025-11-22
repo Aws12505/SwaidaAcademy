@@ -81,28 +81,34 @@ class UserController extends Controller
             ->with('success', 'User deleted successfully.');
     }
 
-public function pressCourseAccess(Request $request, Course $course): RedirectResponse
+public function pressCourseAccess(Request $request,string $locale, $course): RedirectResponse
 {
     $user = $request->user();
-    if (!$user || $user->is_admin) {
+    if (!$user) {
         abort(403, 'Forbidden');
+    }
+    else if ($user->is_admin){
+       return back(); 
     }
 
     // Idempotent pivot attach
-    $user->accessedCourses()->syncWithoutDetaching([$course->id]);
+    $user->accessedCourses()->syncWithoutDetaching([$course]);
 
     // back to the same page (or you can return 204 in JSON if calling via XHR)
     return back();
 }
 
-public function pressScholarshipAccess(Request $request, Scholarship $scholarship): RedirectResponse
+public function pressScholarshipAccess(Request $request,string $locale, $scholarship): RedirectResponse
 {
     $user = $request->user();
-    if (!$user || $user->is_admin) {
+    if (!$user) {
         abort(403, 'Forbidden');
     }
+    else if ($user->is_admin){
+       return back(); 
+    }
 
-    $user->accessedScholarships()->syncWithoutDetaching([$scholarship->id]);
+    $user->accessedScholarships()->syncWithoutDetaching([$scholarship]);
 
     return back();
 }
